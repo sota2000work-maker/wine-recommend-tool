@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>ワインおすすめ提示ツール</title>
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ワインおすすめ">
+<meta name="theme-color" content="#6b1e3f">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<style>
+  :root {
+    --wine: #6b1e3f;
+    --wine-dark: #4a1329;
+    --gold: #a9803f;
+    --gold-soft: #e8d9b8;
+    --cream: #faf6f0;
+    --paper: #ffffff;
+    --ink: #2b2420;
+    --ink-soft: #766a60;
+    --border: #e7ddd0;
+    --red-swatch: #7b1e3c;
+    --white-swatch: #cbb26a;
+    --rose-swatch: #d98a99;
+    --sparkling-swatch: #c9a961;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Hiragino Kaku Gothic ProN", sans-serif;
+    max-width: 900px; margin: 0 auto; padding: 14px 12px 32px;
+    background: var(--cream); color: var(--ink); line-height: 1.5;
+  }
+  h1, h2, h3 { font-family: "Hiragino Mincho ProN", Georgia, serif; font-weight: 600; letter-spacing: .02em; }
+  h1 { font-size: 21px; margin: 4px 0 14px; color: var(--wine-dark); text-align: center; }
+  fieldset { margin-bottom: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--paper); }
+  legend { font-weight: 600; padding: 0 8px; color: var(--wine); font-size: 14px; }
+  label { display: inline-block; margin: 6px 10px 6px 0; padding: 4px 2px; }
+  label input[type="checkbox"], label input[type="radio"] { width: 18px; height: 18px; vertical-align: middle; margin-right: 4px; accent-color: var(--wine); }
+  input[type="text"], input[type="number"], input[type="password"], select {
+    font-size: 16px; padding: 9px 10px; width: 100%; margin: 4px 0 8px;
+    border: 1px solid var(--border); border-radius: 8px; background: var(--paper); color: var(--ink);
+  }
+  input:focus, select:focus { outline: 2px solid var(--gold-soft); border-color: var(--gold); }
+  button { font-size: 16px; padding: 12px 20px; margin-top: 4px; border-radius: 10px; cursor: pointer; transition: transform .05s ease, opacity .15s ease; }
+  button:active { transform: scale(0.98); }
+  button.primary { width: 100%; background: var(--wine); color: #fff; border: none; box-shadow: 0 2px 6px rgba(107,30,63,0.25); }
+  button.secondary { background: var(--paper); border: 1px solid var(--wine); color: var(--wine); }
+  .tabBar { display: flex; gap: 6px; margin-bottom: 14px; position: sticky; top: 0; background: var(--cream); padding: 10px 0 6px; z-index: 5; }
+  .tabBtn { flex: 1; padding: 10px 4px; font-size: 14px; border: 1px solid var(--border); background: var(--paper); color: var(--ink-soft); border-radius: 999px; font-weight: 600; transition: all .15s ease; }
+  .tabBtn.active { background: var(--wine); color: #fff; border-color: var(--wine); box-shadow: 0 2px 6px rgba(107,30,63,0.25); }
+  .tabPanel { display: none; }
+  .tabPanel.active { display: block; animation: fadeIn .2s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
+  .card {
+    border: 1px solid var(--border); border-left: 4px solid var(--border);
+    border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; background: var(--paper);
+    box-shadow: 0 1px 3px rgba(43,36,32,0.06), 0 1px 2px rgba(43,36,32,0.04);
+  }
+  .card.wine-red { border-left-color: var(--red-swatch); }
+  .card.wine-white { border-left-color: var(--white-swatch); }
+  .card.wine-rose { border-left-color: var(--rose-swatch); }
+  .card.wine-sparkling { border-left-color: var(--sparkling-swatch); }
+  .card h3 { margin: 0 0 6px 0; font-size: 16px; display: flex; align-items: center; gap: 6px; }
+  .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08); }
+  .swatch.wine-red { background: var(--red-swatch); }
+  .swatch.wine-white { background: var(--white-swatch); }
+  .swatch.wine-rose { background: var(--rose-swatch); }
+  .swatch.wine-sparkling { background: linear-gradient(135deg, var(--sparkling-swatch), #f3e9c8); }
+  .score {
+    font-weight: 700; color: var(--wine-dark); font-size: 12px; background: var(--gold-soft);
+    padding: 2px 9px; border-radius: 999px; white-space: nowrap; margin-left: auto;
+  }
+  .meta { color: var(--ink-soft); font-size: 13px; }
+  .tag {
+    display: inline-block; background: var(--cream); border: 1px solid var(--border); color: var(--ink);
+    border-radius: 999px; padding: 3px 10px; margin: 2px 4px 2px 0; font-size: 12px;
+  }
+  .reason { margin: 8px 0; font-size: 14px; color: var(--ink); }
+  .trivia {
+    margin: 8px 0; font-size: 13px; color: var(--wine-dark); background: var(--gold-soft);
+    padding: 8px 10px; border-radius: 8px; border-left: 3px solid var(--gold);
+  }
+  .code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; color: var(--ink-soft); letter-spacing: .02em; }
+  .caution { color: #8a3b1c; font-size: 12px; background: #fbeee5; padding: 6px 8px; border-radius: 6px; margin-top: 6px; }
+  .muted { color: var(--ink-soft); font-size: 13px; }
+  .syncBar { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--ink-soft); margin-bottom: 6px; }
+  #regionField { display: none; }
+  .overlay { position: fixed; inset: 0; background: rgba(43,36,32,0.45); display: flex; align-items: flex-end; z-index: 20; backdrop-filter: blur(1px); }
+  .overlay.hidden { display: none; }
+  .sheet { background: var(--paper); width: 100%; max-height: 85vh; overflow-y: auto; border-radius: 16px 16px 0 0; padding: 18px; box-shadow: 0 -4px 20px rgba(0,0,0,0.15); }
+  .sheet .closeBtn { width: 100%; margin-top: 12px; }
+  #adminGate { margin-bottom: 12px; }
+  #adminBody { display: none; }
+  .msg { padding: 9px 11px; border-radius: 8px; margin: 8px 0; font-size: 14px; }
+  .msg.ok { background: #e6f4ea; color: #1e4620; }
+  .msg.err { background: #fdecea; color: #611a15; }
+  #authGate { position: fixed; inset: 0; background: linear-gradient(180deg, var(--wine-dark), var(--wine)); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  #authGate.hidden { display: none; }
+  .authBox { max-width: 360px; width: 100%; background: var(--paper); border-radius: 16px; padding: 24px 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.25); }
+  .authBox h2 { font-size: 19px; margin: 0 0 4px; color: var(--wine-dark); text-align: center; }
+  .authBox .muted { text-align: center; margin-bottom: 14px; }
+
+  @media (max-width: 480px) {
+    body { padding: 10px 8px 28px; font-size: 15px; }
+    label { display: block; }
+  }
+</style>
+</head>
+<body>
+
+<div id="authGate">
+  <div class="authBox">
+    <h2>スタッフパスコード</h2>
+    <p class="muted">この先は店舗スタッフ専用です。パスコードを入力してください。</p>
+    <input type="password" id="authPasscode" placeholder="パスコード">
+    <button type="button" id="authButton" class="primary">開く</button>
+    <div id="authMsg"></div>
+  </div>
+</div>
+
+<div id="appRoot" style="display:none;">
+
+<h1>ワインおすすめ提示ツール</h1>
+<div class="syncBar">
+  <span id="syncStatus">同期状況を確認中...</span>
+  <button type="button" id="syncButton" class="secondary" style="padding:4px 10px;font-size:12px;">今すぐ同期</button>
+</div>
+
+<div class="tabBar">
+  <button type="button" class="tabBtn active" data-tab="recommend">レコメンド</button>
+  <button type="button" class="tabBtn" data-tab="list">一覧</button>
+  <button type="button" class="tabBtn" data-tab="admin">管理</button>
+</div>
+
+<section id="tab-recommend" class="tabPanel active">
+  <form id="criteriaForm">
+    <fieldset>
+      <legend>料理ペアリング（カテゴリ）</legend>
+      <div id="pairingFields"></div>
+      <label style="display:block;">自由入力（例：ローストビーフ、刺身 など）
+        <input type="text" id="pairingFreeText" placeholder="料理名を入力">
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>味わい</legend>
+      <div><b>甘辛度</b><div id="sweetnessFields"></div></div>
+      <div><b>ボディ</b><div id="bodyFields"></div></div>
+      <div><b>テイスト</b><div id="tasteTagFields"></div></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>色</legend>
+      <div id="colorFields"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>産地・品種</legend>
+      <div><b>国</b><div id="countryFields"></div></div>
+      <div id="regionField"><b>地方</b><div id="regionFields"></div></div>
+      <div><b>品種</b><div id="varietyFields"></div></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>価格帯</legend>
+      <div id="priceFields"></div>
+    </fieldset>
+
+    <button type="button" id="searchButton" class="primary">この条件で探す</button>
+  </form>
+
+  <div id="results"></div>
+</section>
+
+<section id="tab-list" class="tabPanel">
+  <input type="text" id="listSearch" placeholder="商品名・産地・品種で検索">
+  <div id="listResults"></div>
+</section>
+
+<section id="tab-admin" class="tabPanel">
+  <div id="adminGate">
+    <p class="muted">追加・価格改定・取扱終了の操作には、閲覧用とは別の管理パスコードが必要です。</p>
+    <input type="password" id="adminPasscode" placeholder="管理パスコード">
+    <button type="button" id="adminUnlockButton" class="secondary">管理画面を開く</button>
+  </div>
+
+  <div id="adminBody">
+    <div id="adminMsg"></div>
+
+    <fieldset>
+      <legend>新商品を追加</legend>
+      <label>商品名<input type="text" id="admName"></label>
+      <label>生産者<input type="text" id="admProducer"></label>
+      <label>販売価格（円）<input type="number" id="admPrice"></label>
+      <label>容量（例：750ml）<input type="text" id="admSize"></label>
+      <label>色
+        <select id="admColor"></select>
+      </label>
+      <label>国<input type="text" id="admCountry" placeholder="例：フランス"></label>
+      <label>地方（任意）<input type="text" id="admRegion"></label>
+      <label>品種（カンマ区切り・任意）<input type="text" id="admVarieties"></label>
+      <div><b>甘辛度（複数選択可）</b><div id="admSweetnessFields"></div></div>
+      <div><b>ボディ（複数選択可）</b><div id="admBodyFields"></div></div>
+      <label>テイストタグ（カンマ区切り・任意）<input type="text" id="admTasteTags"></label>
+      <label>ペアリングタグ（カンマ区切り・任意）<input type="text" id="admPairingTags"></label>
+      <label>接客トーク素材（豆知識・任意）<input type="text" id="admTrivia"></label>
+      <button type="button" id="admAddButton" class="primary">この内容で追加</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>価格改定</legend>
+      <label>対象商品
+        <select id="admPriceTarget"></select>
+      </label>
+      <label>新しい販売価格（円）<input type="number" id="admNewPrice"></label>
+      <button type="button" id="admPriceButton" class="primary">価格を更新</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>取扱終了 / 再開</legend>
+      <label>取扱終了にする商品
+        <select id="admDiscontinueTarget"></select>
+      </label>
+      <button type="button" id="admDiscontinueButton" class="secondary">取扱終了にする</button>
+
+      <label>取扱を再開する商品
+        <select id="admReactivateTarget"></select>
+      </label>
+      <button type="button" id="admReactivateButton" class="secondary">取扱を再開する</button>
+    </fieldset>
+  </div>
+</section>
+
+<div id="detailOverlay" class="overlay hidden">
+  <div class="sheet">
+    <div id="detailContent"></div>
+    <button type="button" id="detailCloseButton" class="secondary closeBtn">閉じる</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+// 02_酒部門/ワインおすすめツール/scoring.js
+// 選択肢の定義とマッチングロジック（純粋関数）。
+// build.js でこのファイルの中身がそのまま index.html に埋め込まれるため、
+// ブラウザ・Node.js のどちらでも動く形（ファイル末尾のエクスポート文のみ Node 依存）にしてある。
+
+const PRICE_BANDS = [
+  { id: 'under2000', label: '〜2,000円', min: 0, max: 2000 },
+  { id: '2000to4000', label: '2,000〜4,000円', min: 2000, max: 4000 },
+  { id: '4000to8000', label: '4,000〜8,000円', min: 4000, max: 8000 },
+  { id: 'over8000', label: '8,000円〜', min: 8000, max: Infinity },
+];
+
+const COLORS = ['赤', '白', 'ロゼ', 'スパークリング'];
+
+const COUNTRIES = ['フランス', 'イタリア', 'スペイン', 'ドイツ', '日本', 'チリ', 'アメリカ', 'オーストラリア', 'その他'];
+
+// 国 → 地方（プルダウンの絞り込み表示に使う。ウイスキーツールの「スコットランド選択時のみ地方欄を表示」と同じ考え方）
+const REGIONS_BY_COUNTRY = {
+  フランス: ['ボルドー', 'ブルゴーニュ', 'シャンパーニュ', 'ロワール', 'ローヌ'],
+  イタリア: ['トスカーナ', 'ピエモンテ', 'ヴェネト'],
+  スペイン: ['リオハ', 'カタルーニャ'],
+  日本: ['山梨', '長野', '北海道'],
+};
+
+const VARIETIES = [
+  'シャルドネ', 'ソーヴィニヨン・ブラン', 'リースリング',
+  'カベルネ・ソーヴィニヨン', 'メルロー', 'ピノ・ノワール', 'シラー', 'サンジョヴェーゼ', 'テンプラニーリョ',
+];
+
+const SWEETNESS_LEVELS = ['辛口', 'やや辛口', '中口', 'やや甘口', '甘口'];
+
+const BODY_LEVELS = ['軽め', 'ミディアム', '重め'];
+
+const TASTE_TAGS = [
+  'フルーティ', '酸味が爽やか', 'スパイシー', 'ミネラル感', 'なめらか（タンニン控えめ）', 'しっかりタンニン',
+];
+
+const PAIRING_TAGS = [
+  '牛肉・赤身肉', '豚肉・鶏肉', '魚介・カルパッチョ', '寿司・刺身',
+  'チーズ', 'パスタ・トマト系', '和食全般', 'デザート・甘味', '前菜・軽い料理',
+];
+
+// 自由テキスト入力 → ペアリングタグ変換用キーワード辞書
+// キーは料理名・食材名の代表的な表記、値は対応するペアリングタグ。
+// 辞書にない語は呼び出し側で主要キーワードの部分一致にフォールバックする。
+const PAIRING_KEYWORD_DICTIONARY = {
+  'ローストビーフ': '牛肉・赤身肉', 'ステーキ': '牛肉・赤身肉', '牛肉': '牛肉・赤身肉', '焼肉': '牛肉・赤身肉',
+  '豚肉': '豚肉・鶏肉', '唐揚げ': '豚肉・鶏肉', '鶏肉': '豚肉・鶏肉', 'チキン': '豚肉・鶏肉', '生姜焼き': '豚肉・鶏肉',
+  'カルパッチョ': '魚介・カルパッチョ', '白身魚': '魚介・カルパッチョ', 'エビ': '魚介・カルパッチョ', '貝': '魚介・カルパッチョ',
+  '刺身': '寿司・刺身', '寿司': '寿司・刺身', 'すし': '寿司・刺身',
+  'チーズ': 'チーズ',
+  'パスタ': 'パスタ・トマト系', 'ピザ': 'パスタ・トマト系', 'トマト': 'パスタ・トマト系',
+  '天ぷら': '和食全般', '煮物': '和食全般', '焼き魚': '和食全般', '和食': '和食全般', 'すき焼き': '和食全般',
+  'デザート': 'デザート・甘味', 'ケーキ': 'デザート・甘味', 'チョコレート': 'デザート・甘味', '果物': 'デザート・甘味',
+  '前菜': '前菜・軽い料理', 'サラダ': '前菜・軽い料理',
+};
+
+function priceBandsForProduct(price) {
+  if (price === null || price === undefined) return [];
+  return PRICE_BANDS.filter((b) => price >= b.min && price < b.max).map((b) => b.id);
+}
+
+// 自由テキストをペアリングタグの配列に変換する。
+// 1) 辞書のキーを部分一致で探す 2) 見つからなければ何も返さない（呼び出し側でカテゴリ選択と合算する）
+function resolvePairingText(text) {
+  if (!text) return [];
+  const tags = new Set();
+  Object.keys(PAIRING_KEYWORD_DICTIONARY).forEach((keyword) => {
+    if (text.includes(keyword)) {
+      tags.add(PAIRING_KEYWORD_DICTIONARY[keyword]);
+    }
+  });
+  return Array.from(tags);
+}
+
+function scoreProduct(product, criteria) {
+  let totalCriteria = 0;
+  let matchedCount = 0;
+  const breakdown = {};
+
+  if (criteria.priceBandIds && criteria.priceBandIds.length > 0) {
+    if (product.price !== null && product.price !== undefined) {
+      totalCriteria++;
+      const bandIds = priceBandsForProduct(product.price);
+      const matched = bandIds.some((id) => criteria.priceBandIds.includes(id));
+      if (matched) matchedCount++;
+      breakdown.price = matched;
+    } else {
+      breakdown.price = null;
+    }
+  }
+
+  if (criteria.colors && criteria.colors.length > 0) {
+    totalCriteria++;
+    const matched = product.color != null && criteria.colors.includes(product.color);
+    if (matched) matchedCount++;
+    breakdown.color = matched;
+  }
+
+  if (criteria.countries && criteria.countries.length > 0) {
+    totalCriteria++;
+    const matched = product.country != null && criteria.countries.includes(product.country);
+    if (matched) matchedCount++;
+    breakdown.country = matched;
+  }
+
+  if (criteria.regions && criteria.regions.length > 0) {
+    totalCriteria++;
+    const matched = product.region != null && criteria.regions.includes(product.region);
+    if (matched) matchedCount++;
+    breakdown.region = matched;
+  }
+
+  if (criteria.varieties && criteria.varieties.length > 0) {
+    totalCriteria++;
+    const matched = (product.varieties || []).some((v) => criteria.varieties.includes(v));
+    if (matched) matchedCount++;
+    breakdown.varieties = matched;
+  }
+
+  if (criteria.sweetness && criteria.sweetness.length > 0) {
+    totalCriteria++;
+    const matched = (product.sweetness || []).some((s) => criteria.sweetness.includes(s));
+    if (matched) matchedCount++;
+    breakdown.sweetness = matched;
+  }
+
+  if (criteria.body && criteria.body.length > 0) {
+    totalCriteria++;
+    const matched = (product.body || []).some((b) => criteria.body.includes(b));
+    if (matched) matchedCount++;
+    breakdown.body = matched;
+  }
+
+  if (criteria.tasteTags && criteria.tasteTags.length > 0) {
+    totalCriteria++;
+    const matched = (product.tasteTags || []).some((t) => criteria.tasteTags.includes(t));
+    if (matched) matchedCount++;
+    breakdown.tasteTags = matched;
+  }
+
+  if (criteria.pairingTags && criteria.pairingTags.length > 0) {
+    totalCriteria++;
+    const matchedTags = (product.pairingTags || []).filter((t) => criteria.pairingTags.includes(t));
+    if (matchedTags.length > 0) matchedCount++;
+    breakdown.pairingTags = matchedTags;
+  }
+
+  const score = totalCriteria === 0 ? 0 : matchedCount / totalCriteria;
+  return { score, matchedCount, totalCriteria, breakdown };
+}
+
+function rankProducts(products, criteria, topN) {
+  const active = products.filter((p) => p.status !== 'discontinued');
+  const scored = active.map((p) => ({ product: p, ...scoreProduct(p, criteria) }));
+  scored.sort((a, b) => b.score - a.score || b.matchedCount - a.matchedCount);
+  return scored.slice(0, topN);
+}
+
+
+</script>
+<script>
+const SEED_PRODUCTS = [
+  {
+    "code": "SAMPLE-001",
+    "name": "（サンプル）シャブリ",
+    "producer": "サンプル生産者A",
+    "price": 3500,
+    "size": "750ml",
+    "color": "白",
+    "country": "フランス",
+    "region": "ブルゴーニュ",
+    "varieties": ["シャルドネ"],
+    "sweetness": ["辛口"],
+    "body": ["ミディアム"],
+    "tasteTags": ["ミネラル感", "酸味が爽やか"],
+    "pairingTags": ["魚介・カルパッチョ", "寿司・刺身", "前菜・軽い料理"],
+    "pairingReasons": {
+      "魚介・カルパッチョ": "キリッとした酸とミネラル感が魚介の旨みを引き立てます",
+      "寿司・刺身": "香りが控えめで生魚の繊細な風味を邪魔しません"
+    },
+    "trivia": "シャブリは牡蠣の産地としても知られ、地元では「牡蠣にはシャブリ」という組み合わせが定番です。",
+    "nameConfidence": "high",
+    "attributeConfidence": "high",
+    "attributeSource": null,
+    "status": "active"
+  },
+  {
+    "code": "SAMPLE-002",
+    "name": "（サンプル）ボルドー赤 メルロー主体",
+    "producer": "サンプル生産者B",
+    "price": 4200,
+    "size": "750ml",
+    "color": "赤",
+    "country": "フランス",
+    "region": "ボルドー",
+    "varieties": ["メルロー", "カベルネ・ソーヴィニヨン"],
+    "sweetness": ["辛口"],
+    "body": ["重め"],
+    "tasteTags": ["しっかりタンニン", "フルーティ"],
+    "pairingTags": ["牛肉・赤身肉", "チーズ"],
+    "pairingReasons": {
+      "牛肉・赤身肉": "しっかりしたタンニンが赤身肉の脂と旨みに負けません"
+    },
+    "trivia": "ボルドー地方は複数品種をブレンドするのが伝統的なスタイルで、畑ごとに配合比率が異なります。",
+    "nameConfidence": "high",
+    "attributeConfidence": "high",
+    "attributeSource": null,
+    "status": "active"
+  },
+  {
+    "code": "SAMPLE-003",
+    "name": "（サンプル）キャンティ・クラシコ",
+    "producer": "サンプル生産者C",
+    "price": 2800,
+    "size": "750ml",
+    "color": "赤",
+    "country": "イタリア",
+    "region": "トスカーナ",
+    "varieties": ["サンジョヴェーゼ"],
+    "sweetness": ["辛口"],
+    "body": ["ミディアム"],
+    "tasteTags": ["酸味が爽やか", "フルーティ"],
+    "pairingTags": ["パスタ・トマト系", "牛肉・赤身肉"],
+    "pairingReasons": {
+      "パスタ・トマト系": "酸味の高さがトマトソースの酸と調和します"
+    },
+    "trivia": "ラベルに黒い雄鶏（ガッロ・ネロ）のマークがあるものは、キャンティ・クラシコ生産者協会の認定品です。",
+    "nameConfidence": "high",
+    "attributeConfidence": "high",
+    "attributeSource": null,
+    "status": "active"
+  },
+  {
+    "code": "SAMPLE-004",
+    "name": "（サンプル）甲州辛口",
+    "producer": "サンプル生産者D",
+    "price": 2200,
+    "size": "750ml",
+    "color": "白",
+    "country": "日本",
+    "region": "山梨",
+    "varieties": [],
+    "sweetness": ["辛口"],
+    "body": ["軽め"],
+    "tasteTags": ["ミネラル感", "酸味が爽やか"],
+    "pairingTags": ["寿司・刺身", "和食全般", "前菜・軽い料理"],
+    "pairingReasons": {
+      "和食全般": "繊細でクセがなく、出汁の風味を邪魔しない味わいです"
+    },
+    "trivia": "甲州は日本固有のブドウ品種で、和食との相性を意識した造りが多いのが特徴です。",
+    "nameConfidence": "high",
+    "attributeConfidence": "medium",
+    "attributeSource": null,
+    "status": "active"
+  },
+  {
+    "code": "SAMPLE-005",
+    "name": "（サンプル）プロセッコ",
+    "producer": "サンプル生産者E",
+    "price": 2500,
+    "size": "750ml",
+    "color": "スパークリング",
+    "country": "イタリア",
+    "region": "ヴェネト",
+    "varieties": [],
+    "sweetness": ["やや辛口"],
+    "body": ["軽め"],
+    "tasteTags": ["フルーティ", "酸味が爽やか"],
+    "pairingTags": ["前菜・軽い料理", "チーズ"],
+    "pairingReasons": {
+      "前菜・軽い料理": "軽やかな泡と果実感が食事の始まりにぴったりです"
+    },
+    "trivia": "シャンパーニュと違い、大型タンクで二次発酵させる製法のため比較的リーズナブルに造られます。",
+    "nameConfidence": "high",
+    "attributeConfidence": "high",
+    "attributeSource": null,
+    "status": "active"
+  },
+  {
+    "code": "SAMPLE-006",
+    "name": "（サンプル）シャンパーニュ ブリュット",
+    "producer": "サンプル生産者F",
+    "price": 8500,
+    "size": "750ml",
+    "color": "スパークリング",
+    "country": "フランス",
+    "region": "シャンパーニュ",
+    "varieties": ["シャルドネ"],
+    "sweetness": ["辛口"],
+    "body": ["ミディアム"],
+    "tasteTags": ["ミネラル感", "酸味が爽やか"],
+    "pairingTags": ["前菜・軽い料理", "魚介・カルパッチョ", "デザート・甘味"],
+    "pairingReasons": {
+      "前菜・軽い料理": "きめ細かい泡が食事の始まりに華を添えます"
+    },
+    "trivia": "特別な日の贈り物としても人気が高く、ギフト需要が多い銘柄です。",
+    "nameConfidence": "high",
+    "attributeConfidence": "high",
+    "attributeSource": null,
+    "status": "active"
+  },
+  {
+    "code": "SAMPLE-007",
+    "name": "（サンプル）ロゼ・ダンジュ",
+    "producer": "サンプル生産者G",
+    "price": 1900,
+    "size": "750ml",
+    "color": "ロゼ",
+    "country": "フランス",
+    "region": "ロワール",
+    "varieties": [],
+    "sweetness": ["やや甘口"],
+    "body": ["軽め"],
+    "tasteTags": ["フルーティ"],
+    "pairingTags": ["前菜・軽い料理", "デザート・甘味"],
+    "pairingReasons": {},
+    "trivia": "軽い甘みがあり、ワイン初心者や普段あまり飲まない方への提案にも向いています。",
+    "nameConfidence": "high",
+    "attributeConfidence": "medium",
+    "attributeSource": null,
+    "status": "active"
+  },
+  {
+    "code": "SAMPLE-008",
+    "name": "（サンプル）リオハ・レゼルバ",
+    "producer": "サンプル生産者H",
+    "price": 3900,
+    "size": "750ml",
+    "color": "赤",
+    "country": "スペイン",
+    "region": "リオハ",
+    "varieties": ["テンプラニーリョ"],
+    "sweetness": ["辛口"],
+    "body": ["重め"],
+    "tasteTags": ["しっかりタンニン", "スパイシー"],
+    "pairingTags": ["牛肉・赤身肉", "チーズ"],
+    "pairingReasons": {
+      "牛肉・赤身肉": "樽由来のスパイス香がグリル料理の香ばしさと合います"
+    },
+    "trivia": "「レゼルバ」は熟成期間の規定をクリアした格付けで、樽と瓶熟成にじっくり時間をかけています。",
+    "nameConfidence": "high",
+    "attributeConfidence": "high",
+    "attributeSource": null,
+    "status": "active"
+  },
+  {
+    "code": "SAMPLE-009",
+    "name": "（サンプル）ドイツ リースリング 中口",
+    "producer": "サンプル生産者I",
+    "price": 2600,
+    "size": "750ml",
+    "color": "白",
+    "country": "ドイツ",
+    "region": null,
+    "varieties": ["リースリング"],
+    "sweetness": ["中口"],
+    "body": ["軽め"],
+    "tasteTags": ["フルーティ", "酸味が爽やか"],
+    "pairingTags": ["豚肉・鶏肉", "和食全般", "デザート・甘味"],
+    "pairingReasons": {
+      "豚肉・鶏肉": "ほのかな甘みが辛味のある味付けとよく合います"
+    },
+    "trivia": "リースリングは酸と甘みのバランスが多彩で、ラベルの表記（Trocken=辛口など）で見分けられます。",
+    "nameConfidence": "high",
+    "attributeConfidence": "medium",
+    "attributeSource": null,
+    "status": "active"
+  },
+  {
+    "code": "SAMPLE-010",
+    "name": "（サンプル）チリ カベルネ・ソーヴィニヨン デイリー",
+    "producer": "サンプル生産者J",
+    "price": 1500,
+    "size": "750ml",
+    "color": "赤",
+    "country": "チリ",
+    "region": null,
+    "varieties": ["カベルネ・ソーヴィニヨン"],
+    "sweetness": ["辛口"],
+    "body": ["ミディアム"],
+    "tasteTags": ["フルーティ", "しっかりタンニン"],
+    "pairingTags": ["牛肉・赤身肉", "パスタ・トマト系"],
+    "pairingReasons": {
+      "牛肉・赤身肉": "コストパフォーマンスが高く、普段使いの赤身肉料理に合わせやすい一本です"
+    },
+    "trivia": "チリは寒暖差の大きい産地が多く、凝縮感のあるカベルネ・ソーヴィニヨンが手頃な価格で手に入ります。",
+    "nameConfidence": "high",
+    "attributeConfidence": "high",
+    "attributeSource": null,
+    "status": "active"
+  },
+  {
+    "code": "SAMPLE-011",
+    "name": "（サンプル）ナパヴァレー シャルドネ",
+    "producer": "サンプル生産者K",
+    "price": 6500,
+    "size": "750ml",
+    "color": "白",
+    "country": "アメリカ",
+    "region": null,
+    "varieties": ["シャルドネ"],
+    "sweetness": ["辛口"],
+    "body": ["重め"],
+    "tasteTags": ["フルーティ", "なめらか（タンニン控えめ）"],
+    "pairingTags": ["チーズ", "パスタ・トマト系"],
+    "pairingReasons": {},
+    "trivia": "樽熟成によるバニラやバターのような香りが特徴で、しっかりした料理にも負けない厚みがあります。",
+    "nameConfidence": "high",
+    "attributeConfidence": "medium",
+    "attributeSource": null,
+    "status": "active"
+  },
+  {
+    "code": "SAMPLE-012",
+    "name": "（サンプル）取扱終了デモ用ワイン",
+    "producer": "サンプル生産者L",
+    "price": 3000,
+    "size": "750ml",
+    "color": "赤",
+    "country": "その他",
+    "region": null,
+    "varieties": [],
+    "sweetness": ["辛口"],
+    "body": ["ミディアム"],
+    "tasteTags": [],
+    "pairingTags": [],
+    "pairingReasons": {},
+    "trivia": "管理タブでの「取扱終了」表示・一覧からの除外を確認するためのサンプルです。",
+    "nameConfidence": "high",
+    "attributeConfidence": "high",
+    "attributeSource": null,
+    "status": "discontinued"
+  }
+]
+;
+
+// ここにGoogle Apps ScriptのWebアプリURLを設定すると、スタッフパスコードでの同期・
+// 管理タブでの追加/価格改定/取扱終了が有効になる。
+// 未設定の間は開発確認用として、パスコード入力後にSEED_PRODUCTS（非機密のプレースホルダー）
+// を表示する（実データではないので公開ホスティングしても問題ない）。
+// 設定後は build.js を再実行して index.html を作り直すこと。
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyayRiyGuhpOexpqRmFZiuM6WqSmr_tpGGNhw3ocW-YVEhxTqChiARbXGbreMESreFa/exec';
+
+const STORAGE_KEY = 'wineToolCache_v1';
+const STAFF_PASSCODE_KEY = 'wineToolStaffPasscode_v1';
+
+let PRODUCTS = [];
+
+function loadCache() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed.products || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveCache(products) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ products, syncedAt: Date.now() }));
+  } catch (e) {
+    // 保存できなくても動作は継続する
+  }
+}
+
+function getLastSyncedAt() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw).syncedAt || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function formatSyncedAt(ts) {
+  if (!ts) return '未同期';
+  const d = new Date(ts);
+  return '最終同期: ' + d.toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function updateSyncStatus() {
+  document.getElementById('syncStatus').textContent = formatSyncedAt(getLastSyncedAt());
+}
+
+// スタッフパスコードを添えてApps Scriptから最新データを取得する。
+// 戻り値: { ok, reason } reasonは 'network'（通信不可）/ 'invalid'（パスコード誤り）/ 'not_configured'
+async function syncFromServer(passcode, silent) {
+  if (!APPS_SCRIPT_URL) {
+    return { ok: false, reason: 'not_configured' };
+  }
+  try {
+    const url = APPS_SCRIPT_URL + '?passcode=' + encodeURIComponent(passcode);
+    const res = await fetch(url, { method: 'GET' });
+    const data = await res.json();
+    if (data.error === 'passcode_invalid') {
+      return { ok: false, reason: 'invalid' };
+    }
+    if (!data.products) throw new Error('invalid_response');
+    PRODUCTS = data.products;
+    saveCache(PRODUCTS);
+    updateSyncStatus();
+    renderListResults();
+    populateAdminSelects();
+    return { ok: true };
+  } catch (e) {
+    if (!silent) alert('同期に失敗しました。通信環境をご確認ください。');
+    return { ok: false, reason: 'network' };
+  }
+}
+
+document.getElementById('syncButton').addEventListener('click', async () => {
+  const passcode = localStorage.getItem(STAFF_PASSCODE_KEY) || '';
+  await syncFromServer(passcode, false);
+});
+
+// ---------- 起動時認証ゲート ----------
+
+function showAuthError(text) {
+  document.getElementById('authMsg').innerHTML = `<div class="msg err">${text}</div>`;
+}
+
+function enterApp() {
+  document.getElementById('authGate').classList.add('hidden');
+  document.getElementById('appRoot').style.display = 'block';
+  startApp();
+}
+
+async function tryStaffLogin(passcode, silent) {
+  if (!APPS_SCRIPT_URL) {
+    // Apps Script未設定時の開発確認用フォールバック（非機密のプレースホルダーデータのみ使用）
+    PRODUCTS = loadCache() || SEED_PRODUCTS;
+    localStorage.setItem(STAFF_PASSCODE_KEY, passcode);
+    return true;
+  }
+  const result = await syncFromServer(passcode, true);
+  if (result.ok) {
+    localStorage.setItem(STAFF_PASSCODE_KEY, passcode);
+    return true;
+  }
+  if (result.reason === 'network') {
+    // オフライン時は、直近まで認証済みだった端末ならキャッシュで継続動作させる
+    const cached = loadCache();
+    if (cached && localStorage.getItem(STAFF_PASSCODE_KEY)) {
+      PRODUCTS = cached;
+      return true;
+    }
+    if (!silent) showAuthError('通信環境をご確認ください（初回はオンラインでの認証が必要です）。');
+    return false;
+  }
+  if (!silent) showAuthError('パスコードが正しくありません。');
+  localStorage.removeItem(STAFF_PASSCODE_KEY);
+  return false;
+}
+
+document.getElementById('authButton').addEventListener('click', async () => {
+  const passcode = document.getElementById('authPasscode').value;
+  if (!passcode) { showAuthError('パスコードを入力してください'); return; }
+  const ok = await tryStaffLogin(passcode, false);
+  if (ok) enterApp();
+});
+
+async function initAuth() {
+  const storedPasscode = localStorage.getItem(STAFF_PASSCODE_KEY);
+  if (storedPasscode) {
+    const ok = await tryStaffLogin(storedPasscode, true);
+    if (ok) { enterApp(); return; }
+  }
+  // ゲート画面のまま入力待ち
+}
+
+// ---------- レコメンドタブ ----------
+
+function renderCheckboxGroup(containerId, name, values) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = values.map((v) =>
+    `<label><input type="checkbox" name="${name}" value="${v}">${v}</label>`
+  ).join('');
+}
+
+function renderSelectOptions(selectId, values, placeholder) {
+  const select = document.getElementById(selectId);
+  const opts = placeholder ? [`<option value="">${placeholder}</option>`] : [];
+  select.innerHTML = opts.concat(values.map((v) => `<option value="${v}">${v}</option>`)).join('');
+}
+
+function initForm() {
+  renderCheckboxGroup('pairingFields', 'pairing', PAIRING_TAGS);
+  renderCheckboxGroup('sweetnessFields', 'sweetness', SWEETNESS_LEVELS);
+  renderCheckboxGroup('bodyFields', 'body', BODY_LEVELS);
+  renderCheckboxGroup('tasteTagFields', 'tasteTag', TASTE_TAGS);
+  renderCheckboxGroup('colorFields', 'color', COLORS);
+  renderCheckboxGroup('countryFields', 'country', COUNTRIES);
+  renderCheckboxGroup('priceFields', 'price', PRICE_BANDS.map((b) => b.label));
+  renderCheckboxGroup('varietyFields', 'variety', VARIETIES);
+
+  document.getElementById('countryFields').addEventListener('change', updateRegionField);
+}
+
+function updateRegionField() {
+  const checkedCountries = getCheckedValues('country');
+  const applicableRegions = Array.from(new Set(
+    checkedCountries.flatMap((c) => REGIONS_BY_COUNTRY[c] || [])
+  ));
+  const regionField = document.getElementById('regionField');
+  if (applicableRegions.length === 0) {
+    regionField.style.display = 'none';
+    renderCheckboxGroup('regionFields', 'region', []);
+    return;
+  }
+  regionField.style.display = 'block';
+  renderCheckboxGroup('regionFields', 'region', applicableRegions);
+}
+
+function getCheckedValues(name) {
+  return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map((el) => el.value);
+}
+
+function priceLabelsToBandIds(labels) {
+  return PRICE_BANDS.filter((b) => labels.includes(b.label)).map((b) => b.id);
+}
+
+function wineColorClass(color) {
+  if (color === '赤') return 'wine-red';
+  if (color === '白') return 'wine-white';
+  if (color === 'ロゼ') return 'wine-rose';
+  if (color === 'スパークリング') return 'wine-sparkling';
+  return '';
+}
+
+function buildReasonText(product, matchedPairingTags) {
+  if (!matchedPairingTags || matchedPairingTags.length === 0) return '';
+  const reasons = matchedPairingTags
+    .map((tag) => (product.pairingReasons || {})[tag])
+    .filter(Boolean);
+  if (reasons.length === 0) {
+    return `<div class="reason">選択された料理（${matchedPairingTags.join('、')}）との相性が良いタイプです</div>`;
+  }
+  return `<div class="reason">${reasons.join('<br>')}</div>`;
+}
+
+function renderResultCard(entry) {
+  const p = entry.product;
+  const percent = Math.round(entry.score * 100);
+  const lowConfidence = p.nameConfidence === 'medium' || p.nameConfidence === 'low'
+    || p.attributeConfidence === 'medium' || p.attributeConfidence === 'low' || p.attributeConfidence === 'not_found';
+  const caution = lowConfidence
+    ? `<div class="caution">⚠ 情報の確証度が低めです。商品コード <span class="code">${p.code}</span> で現物のラベルをご確認ください</div>`
+    : '';
+  const tasteLine = [...(p.sweetness || []), ...(p.body || [])].join(' / ');
+  const trivia = p.trivia ? `<div class="trivia">${p.trivia}</div>` : '';
+  const reason = buildReasonText(p, entry.breakdown && entry.breakdown.pairingTags);
+  return `
+    <div class="card ${wineColorClass(p.color)}">
+      <h3><span class="swatch ${wineColorClass(p.color)}"></span>${p.name}<span class="score">一致度 ${percent}%</span></h3>
+      <div class="meta">${p.price === null || p.price === undefined ? '価格不明' : p.price.toLocaleString() + '円'}${p.size ? '（' + p.size + '）' : ''} ／ ${p.color || ''} ／ ${p.country || '産地不明'}${p.region ? '（' + p.region + '）' : ''}</div>
+      <div class="meta">${tasteLine}</div>
+      <div>${(p.tasteTags || []).map((t) => `<span class="tag">${t}</span>`).join('')}</div>
+      <div>${(p.pairingTags || []).map((t) => `<span class="tag">${t}</span>`).join('')}</div>
+      ${reason}
+      ${trivia}
+      ${caution}
+      <div class="code" style="margin-top:6px;">コード: ${p.code}</div>
+    </div>
+  `;
+}
+
+document.getElementById('searchButton').addEventListener('click', () => {
+  const freeTextTags = resolvePairingText(document.getElementById('pairingFreeText').value);
+  const pairingTags = Array.from(new Set([...getCheckedValues('pairing'), ...freeTextTags]));
+  const criteria = {
+    priceBandIds: priceLabelsToBandIds(getCheckedValues('price')),
+    colors: getCheckedValues('color'),
+    countries: getCheckedValues('country'),
+    regions: getCheckedValues('region'),
+    varieties: getCheckedValues('variety'),
+    sweetness: getCheckedValues('sweetness'),
+    body: getCheckedValues('body'),
+    tasteTags: getCheckedValues('tasteTag'),
+    pairingTags,
+  };
+  const ranked = rankProducts(PRODUCTS, criteria, 10);
+  document.getElementById('results').innerHTML = ranked.length > 0
+    ? ranked.map(renderResultCard).join('')
+    : '<p class="muted">条件に合う商品が見つかりませんでした。条件を減らしてお試しください。</p>';
+});
+
+// ---------- 一覧タブ ----------
+
+function renderListCard(p) {
+  return `
+    <div class="card ${wineColorClass(p.color)}" data-code="${p.code}">
+      <h3><span class="swatch ${wineColorClass(p.color)}"></span>${p.name}</h3>
+      <div class="meta">${p.price === null || p.price === undefined ? '価格不明' : p.price.toLocaleString() + '円'}${p.size ? '（' + p.size + '）' : ''} ／ ${p.color || ''} ／ ${p.country || '産地不明'}${p.region ? '（' + p.region + '）' : ''}</div>
+      <div>${(p.varieties || []).map((v) => `<span class="tag">${v}</span>`).join('')}</div>
+      <div class="code" style="margin-top:6px;">コード: ${p.code}</div>
+    </div>
+  `;
+}
+
+function renderListResults() {
+  const q = (document.getElementById('listSearch').value || '').trim();
+  const active = PRODUCTS.filter((p) => p.status !== 'discontinued');
+  const filtered = q
+    ? active.filter((p) => [p.name, p.country, p.region, ...(p.varieties || [])].filter(Boolean).some((v) => v.includes(q)))
+    : active;
+  const container = document.getElementById('listResults');
+  container.innerHTML = filtered.map(renderListCard).join('');
+  container.querySelectorAll('.card').forEach((card) => {
+    card.addEventListener('click', () => openDetail(card.getAttribute('data-code')));
+  });
+}
+
+document.getElementById('listSearch').addEventListener('input', renderListResults);
+
+// ---------- 詳細オーバーレイ ----------
+
+function openDetail(code) {
+  const p = PRODUCTS.find((x) => x.code === code);
+  if (!p) return;
+  const tasteLine = [...(p.sweetness || []), ...(p.body || [])].join(' / ');
+  const pairingReasonLines = Object.entries(p.pairingReasons || {})
+    .map(([tag, reason]) => `<div class="reason"><b>${tag}</b>：${reason}</div>`).join('');
+  const lowConfidence = p.nameConfidence === 'medium' || p.nameConfidence === 'low'
+    || p.attributeConfidence === 'medium' || p.attributeConfidence === 'low' || p.attributeConfidence === 'not_found';
+  document.getElementById('detailContent').innerHTML = `
+    <h2><span class="swatch ${wineColorClass(p.color)}"></span>${p.name}</h2>
+    <div class="muted">${p.producer || ''}</div>
+    <div class="meta">${p.price === null || p.price === undefined ? '価格不明' : p.price.toLocaleString() + '円'}${p.size ? '（' + p.size + '）' : ''} ／ ${p.color || ''} ／ ${p.country || '産地不明'}${p.region ? '（' + p.region + '）' : ''}</div>
+    <div>${(p.varieties || []).map((v) => `<span class="tag">${v}</span>`).join('')}</div>
+    <p class="meta">${tasteLine}</p>
+    <div>${(p.tasteTags || []).map((t) => `<span class="tag">${t}</span>`).join('')}</div>
+    <h3>ペアリング</h3>
+    <div>${(p.pairingTags || []).map((t) => `<span class="tag">${t}</span>`).join('')}</div>
+    ${pairingReasonLines}
+    ${p.trivia ? `<h3>接客トーク素材</h3><div class="trivia">${p.trivia}</div>` : ''}
+    ${p.status === 'discontinued' ? '<div class="caution">現在は取扱終了商品です</div>' : ''}
+    ${lowConfidence ? '<div class="caution">⚠ 情報の確証度が低めです。下記コードで現物のラベルをご確認ください</div>' : ''}
+    <div class="code" style="margin-top:8px;">商品コード: ${p.code}</div>
+  `;
+  document.getElementById('detailOverlay').classList.remove('hidden');
+}
+
+document.getElementById('detailCloseButton').addEventListener('click', () => {
+  document.getElementById('detailOverlay').classList.add('hidden');
+});
+
+// ---------- 管理タブ ----------
+
+let adminPasscodeValue = '';
+
+document.getElementById('adminUnlockButton').addEventListener('click', () => {
+  const value = document.getElementById('adminPasscode').value;
+  if (!value) {
+    alert('パスコードを入力してください');
+    return;
+  }
+  adminPasscodeValue = value;
+  document.getElementById('adminBody').style.display = 'block';
+  populateAdminSelects();
+});
+
+function populateAdminSelects() {
+  renderSelectOptions('admColor', COLORS);
+  renderCheckboxGroup('admSweetnessFields', 'admSweetness', SWEETNESS_LEVELS);
+  renderCheckboxGroup('admBodyFields', 'admBody', BODY_LEVELS);
+  const active = PRODUCTS.filter((p) => p.status !== 'discontinued');
+  const discontinued = PRODUCTS.filter((p) => p.status === 'discontinued');
+  const activeOptions = active.map((p) => `<option value="${p.code}">${p.name}</option>`).join('');
+  const discontinuedOptions = discontinued.map((p) => `<option value="${p.code}">${p.name}</option>`).join('');
+  document.getElementById('admPriceTarget').innerHTML = activeOptions;
+  document.getElementById('admDiscontinueTarget').innerHTML = activeOptions;
+  document.getElementById('admReactivateTarget').innerHTML = discontinuedOptions;
+}
+
+function showAdminMsg(text, ok) {
+  const el = document.getElementById('adminMsg');
+  el.innerHTML = `<div class="msg ${ok ? 'ok' : 'err'}">${text}</div>`;
+}
+
+async function callAppsScript(payload) {
+  if (!APPS_SCRIPT_URL) {
+    showAdminMsg('Apps ScriptのURLが未設定です。READMEを参照して設定してください。', false);
+    return false;
+  }
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ ...payload, passcode: adminPasscodeValue }),
+    });
+    const data = await res.json();
+    if (data.error === 'passcode_invalid') {
+      showAdminMsg('パスコードが正しくありません。', false);
+      return false;
+    }
+    if (data.error) {
+      showAdminMsg('エラーが発生しました: ' + data.error, false);
+      return false;
+    }
+    const staffPasscode = localStorage.getItem(STAFF_PASSCODE_KEY) || '';
+    await syncFromServer(staffPasscode, true);
+    return true;
+  } catch (e) {
+    showAdminMsg('通信エラーが発生しました。通信環境をご確認ください。', false);
+    return false;
+  }
+}
+
+function splitCsv(text) {
+  return (text || '').split(',').map((s) => s.trim()).filter(Boolean);
+}
+
+document.getElementById('admAddButton').addEventListener('click', async () => {
+  const name = document.getElementById('admName').value.trim();
+  if (!name) { showAdminMsg('商品名を入力してください', false); return; }
+  const product = {
+    code: 'W-' + Date.now(),
+    name,
+    producer: document.getElementById('admProducer').value.trim() || null,
+    price: Number(document.getElementById('admPrice').value) || null,
+    size: document.getElementById('admSize').value.trim() || null,
+    color: document.getElementById('admColor').value || null,
+    country: document.getElementById('admCountry').value.trim() || null,
+    region: document.getElementById('admRegion').value.trim() || null,
+    varieties: splitCsv(document.getElementById('admVarieties').value),
+    sweetness: getCheckedValues('admSweetness'),
+    body: getCheckedValues('admBody'),
+    tasteTags: splitCsv(document.getElementById('admTasteTags').value),
+    pairingTags: splitCsv(document.getElementById('admPairingTags').value),
+    pairingReasons: {},
+    trivia: document.getElementById('admTrivia').value.trim() || null,
+    nameConfidence: 'high',
+    attributeConfidence: 'high',
+    attributeSource: null,
+    status: 'active',
+  };
+  const success = await callAppsScript({ action: 'add', product });
+  if (success) showAdminMsg('「' + name + '」を追加しました', true);
+});
+
+document.getElementById('admPriceButton').addEventListener('click', async () => {
+  const code = document.getElementById('admPriceTarget').value;
+  const newPrice = Number(document.getElementById('admNewPrice').value);
+  if (!code || !newPrice) { showAdminMsg('対象商品と新価格を指定してください', false); return; }
+  const success = await callAppsScript({ action: 'update', code, patch: { price: newPrice } });
+  if (success) showAdminMsg('価格を更新しました', true);
+});
+
+document.getElementById('admDiscontinueButton').addEventListener('click', async () => {
+  const code = document.getElementById('admDiscontinueTarget').value;
+  if (!code) { showAdminMsg('対象商品を選択してください', false); return; }
+  const success = await callAppsScript({ action: 'setStatus', code, status: 'discontinued' });
+  if (success) showAdminMsg('取扱終了にしました', true);
+});
+
+document.getElementById('admReactivateButton').addEventListener('click', async () => {
+  const code = document.getElementById('admReactivateTarget').value;
+  if (!code) { showAdminMsg('対象商品を選択してください', false); return; }
+  const success = await callAppsScript({ action: 'setStatus', code, status: 'active' });
+  if (success) showAdminMsg('取扱を再開しました', true);
+});
+
+// ---------- タブ切り替え ----------
+
+document.querySelectorAll('.tabBtn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tabBtn').forEach((b) => b.classList.remove('active'));
+    document.querySelectorAll('.tabPanel').forEach((p) => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.getAttribute('data-tab')).classList.add('active');
+  });
+});
+
+// ---------- アプリ本体の初期化（認証成功後に実行） ----------
+
+function startApp() {
+  initForm();
+  updateRegionField();
+  renderListResults();
+  updateSyncStatus();
+  populateAdminSelects();
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
+initAuth();
+</script>
+</body>
+</html>
