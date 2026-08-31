@@ -928,7 +928,7 @@ document.getElementById('searchButton').addEventListener('click', () => {
     tasteTags: getCheckedValues('tasteTag'),
     pairingTags,
   };
-  const ranked = rankProducts(PRODUCTS, criteria, 10);
+  const ranked = rankProducts(PRODUCTS, criteria, 20);
   document.getElementById('results').innerHTML = ranked.length > 0
     ? ranked.map(renderResultCard).join('')
     : '<p class="muted">条件に合う商品が見つかりませんでした。条件を減らしてお試しください。</p>';
