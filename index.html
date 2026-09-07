@@ -89,6 +89,7 @@
   .syncBar { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--ink-soft); margin-bottom: 6px; }
   #regionField { display: none; }
   .overlay { position: fixed; inset: 0; background: rgba(43,36,32,0.45); display: flex; align-items: flex-end; z-index: 20; backdrop-filter: blur(1px); }
+  .hidden { display: none; }
   .overlay.hidden { display: none; }
   .sheet { background: var(--paper); width: 100%; max-height: 85vh; overflow-y: auto; border-radius: 16px 16px 0 0; padding: 18px; box-shadow: 0 -4px 20px rgba(0,0,0,0.15); }
   .sheet .closeBtn { width: 100%; margin-top: 12px; }
@@ -132,11 +133,17 @@
 <div class="tabBar">
   <button type="button" class="tabBtn active" data-tab="recommend">レコメンド</button>
   <button type="button" class="tabBtn" data-tab="list">一覧</button>
+  <button type="button" class="tabBtn" data-tab="learn">学ぶ</button>
   <button type="button" class="tabBtn" data-tab="admin">管理</button>
 </div>
 
 <section id="tab-recommend" class="tabPanel active">
   <form id="criteriaForm">
+    <fieldset>
+      <legend>フリーワード検索（任意）</legend>
+      <input type="text" id="recommendFreeText" placeholder="商品名・産地・品種で検索">
+    </fieldset>
+
     <fieldset>
       <legend>料理ペアリング（カテゴリ）</legend>
       <div id="pairingFields"></div>
@@ -167,6 +174,14 @@
     <fieldset>
       <legend>価格帯</legend>
       <div id="priceFields"></div>
+      <label style="display:block;margin-top:8px;">自由入力（入力時はチェックボックスより優先されます）
+        <div style="display:flex;align-items:center;gap:6px;">
+          <input type="number" id="priceMinInput" placeholder="下限" style="width:auto;flex:1;" min="0">
+          <span>円 〜</span>
+          <input type="number" id="priceMaxInput" placeholder="上限" style="width:auto;flex:1;" min="0">
+          <span>円</span>
+        </div>
+      </label>
     </fieldset>
 
     <button type="button" id="searchButton" class="primary">この条件で探す</button>
@@ -179,6 +194,45 @@
 <section id="tab-list" class="tabPanel">
   <input type="text" id="listSearch" placeholder="商品名・産地・品種で検索">
   <div id="listResults"></div>
+</section>
+
+<section id="tab-learn" class="tabPanel">
+  <p class="muted">接客中に説明に困りやすい基本用語をまとめました。</p>
+
+  <div class="card">
+    <h3>ボディ</h3>
+    <div class="meta">口に含んだときの重さ・飲みごたえのこと。「軽め」はさらっと軽快、「重め」は濃厚でしっかりした飲み応え。一般に、アルコール度数や渋み・凝縮感が強いほどボディは重くなる傾向がある。</div>
+  </div>
+
+  <div class="card">
+    <h3>タンニン</h3>
+    <div class="meta">主に赤ワインに含まれる渋み成分。ブドウの皮や種、樽由来で生まれる。タンニンが強いワインは「渋め」「しっかりした」と表現され、脂の多い肉料理などと好相性。白ワインにはほとんど含まれない。</div>
+  </div>
+
+  <div class="card">
+    <h3>酸味</h3>
+    <div class="meta">ワインのフレッシュさ・キレを感じさせる要素。酸味が強いと「爽やか」「シャープ」、弱いと「まろやか」と表現される。酸味の強いワインは、油分の多い料理や魚介と合わせやすい。</div>
+  </div>
+
+  <div class="card">
+    <h3>甘辛度（辛口〜甘口）</h3>
+    <div class="meta">残糖（発酵しきらずに残った糖分）の量によって決まる甘さの度合い。「辛口」は糖分がほぼ残らずすっきり、「甘口」は糖分が多く残り甘さを感じる。食中酒には辛口〜中口が選ばれやすい。</div>
+  </div>
+
+  <div class="card">
+    <h3>ブドウ品種とは</h3>
+    <div class="meta">ワインの原料になるブドウの種類。品種によって色・香り・味わいの傾向が大きく変わる。同じ産地でも品種が違えば味は別物になるため、「品種名」はお客様の好みを推測する手がかりになる。</div>
+  </div>
+
+  <div class="card">
+    <h3>産地・地方の読み方の基本</h3>
+    <div class="meta">「国」の下に「地方（例：ボルドー、トスカーナ）」があり、同じ国でも地方によって気候や土壌が異なるため味わいの傾向も変わる。産地名だけでも、ある程度どんな味わいかの見当をつけられる。</div>
+  </div>
+
+  <div class="card">
+    <h3>スワリング・デキャンタージュ</h3>
+    <div class="meta">スワリングはグラスを回して香りを立たせる所作。デキャンタージュは別容器に移し替えて空気に触れさせ、香りを開かせたり澱を取り除いたりすること。若く渋みの強い赤ワインなどで効果が出やすい。</div>
+  </div>
 </section>
 
 <section id="tab-admin" class="tabPanel">
@@ -231,6 +285,19 @@
         <select id="admReactivateTarget"></select>
       </label>
       <button type="button" id="admReactivateButton" class="secondary">取扱を再開する</button>
+
+      <hr style="margin:16px 0;">
+
+      <label>完全に削除する商品（取扱終了中のみ）
+        <select id="admDeleteTarget"></select>
+      </label>
+      <button type="button" id="admDeleteButton" class="secondary">完全に削除する</button>
+
+      <div id="admDeleteConfirm" class="hidden" style="border:2px solid #b3261e;border-radius:8px;padding:10px;margin-top:8px;">
+        <p><b id="admDeleteConfirmName"></b> を完全に削除します。<br>この操作は元に戻せません。よろしいですか？</p>
+        <button type="button" id="admDeleteConfirmButton" class="secondary" style="color:#b3261e;">はい、完全に削除する</button>
+        <button type="button" id="admDeleteCancelButton" class="secondary">キャンセル</button>
+      </div>
     </fieldset>
   </div>
 </section>
@@ -325,7 +392,21 @@ function scoreProduct(product, criteria) {
   let matchedCount = 0;
   const breakdown = {};
 
-  if (criteria.priceBandIds && criteria.priceBandIds.length > 0) {
+  const hasFreePriceRange = (criteria.priceMin !== null && criteria.priceMin !== undefined)
+    || (criteria.priceMax !== null && criteria.priceMax !== undefined);
+
+  if (hasFreePriceRange) {
+    if (product.price !== null && product.price !== undefined) {
+      totalCriteria++;
+      const min = criteria.priceMin !== null && criteria.priceMin !== undefined ? criteria.priceMin : -Infinity;
+      const max = criteria.priceMax !== null && criteria.priceMax !== undefined ? criteria.priceMax : Infinity;
+      const matched = product.price >= min && product.price <= max;
+      if (matched) matchedCount++;
+      breakdown.price = matched;
+    } else {
+      breakdown.price = null;
+    }
+  } else if (criteria.priceBandIds && criteria.priceBandIds.length > 0) {
     if (product.price !== null && product.price !== undefined) {
       totalCriteria++;
       const bandIds = priceBandsForProduct(product.price);
@@ -397,8 +478,15 @@ function scoreProduct(product, criteria) {
   return { score, matchedCount, totalCriteria, breakdown };
 }
 
+// 商品名・国・地方・品種を対象にした部分一致検索（一覧タブ・レコメンドタブ共通）
+function matchesFreeText(product, text) {
+  if (!text) return true;
+  return [product.name, product.country, product.region, ...(product.varieties || [])]
+    .filter(Boolean).some((v) => v.includes(text));
+}
+
 function rankProducts(products, criteria, topN) {
-  const active = products.filter((p) => p.status !== 'discontinued');
+  const active = products.filter((p) => p.status !== 'discontinued' && matchesFreeText(p, criteria.freeText));
   const scored = active.map((p) => ({ product: p, ...scoreProduct(p, criteria) }));
   scored.sort((a, b) => b.score - a.score || b.matchedCount - a.matchedCount);
   return scored.slice(0, topN);
@@ -915,11 +1003,21 @@ function renderResultCard(entry) {
   `;
 }
 
+function parsePriceInput(id) {
+  const raw = document.getElementById(id).value;
+  if (raw === '' || raw === null) return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+}
+
 document.getElementById('searchButton').addEventListener('click', () => {
   const freeTextTags = resolvePairingText(document.getElementById('pairingFreeText').value);
   const pairingTags = Array.from(new Set([...getCheckedValues('pairing'), ...freeTextTags]));
   const criteria = {
+    freeText: document.getElementById('recommendFreeText').value.trim(),
     priceBandIds: priceLabelsToBandIds(getCheckedValues('price')),
+    priceMin: parsePriceInput('priceMinInput'),
+    priceMax: parsePriceInput('priceMaxInput'),
     colors: getCheckedValues('color'),
     countries: getCheckedValues('country'),
     regions: getCheckedValues('region'),
@@ -938,6 +1036,9 @@ document.getElementById('searchButton').addEventListener('click', () => {
 document.getElementById('clearCriteriaButton').addEventListener('click', () => {
   document.getElementById('criteriaForm').querySelectorAll('input[type="checkbox"]').forEach((el) => { el.checked = false; });
   document.getElementById('pairingFreeText').value = '';
+  document.getElementById('recommendFreeText').value = '';
+  document.getElementById('priceMinInput').value = '';
+  document.getElementById('priceMaxInput').value = '';
   updateRegionField();
   document.getElementById('results').innerHTML = '';
 });
@@ -1028,6 +1129,8 @@ function populateAdminSelects() {
   document.getElementById('admPriceTarget').innerHTML = activeOptions;
   document.getElementById('admDiscontinueTarget').innerHTML = activeOptions;
   document.getElementById('admReactivateTarget').innerHTML = discontinuedOptions;
+  document.getElementById('admDeleteTarget').innerHTML = discontinuedOptions;
+  document.getElementById('admDeleteConfirm').classList.add('hidden');
 }
 
 function showAdminMsg(text, ok) {
@@ -1115,6 +1218,26 @@ document.getElementById('admReactivateButton').addEventListener('click', async (
   if (!code) { showAdminMsg('対象商品を選択してください', false); return; }
   const success = await callAppsScript({ action: 'setStatus', code, status: 'active' });
   if (success) showAdminMsg('取扱を再開しました', true);
+});
+
+document.getElementById('admDeleteButton').addEventListener('click', () => {
+  const code = document.getElementById('admDeleteTarget').value;
+  if (!code) { showAdminMsg('対象商品を選択してください', false); return; }
+  const product = PRODUCTS.find((p) => p.code === code);
+  document.getElementById('admDeleteConfirmName').textContent = product ? product.name : code;
+  document.getElementById('admDeleteConfirm').classList.remove('hidden');
+});
+
+document.getElementById('admDeleteCancelButton').addEventListener('click', () => {
+  document.getElementById('admDeleteConfirm').classList.add('hidden');
+});
+
+document.getElementById('admDeleteConfirmButton').addEventListener('click', async () => {
+  const code = document.getElementById('admDeleteTarget').value;
+  if (!code) { showAdminMsg('対象商品を選択してください', false); return; }
+  document.getElementById('admDeleteConfirm').classList.add('hidden');
+  const success = await callAppsScript({ action: 'delete', code });
+  if (success) showAdminMsg('完全に削除しました', true);
 });
 
 // ---------- タブ切り替え ----------
