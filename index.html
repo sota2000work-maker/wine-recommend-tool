@@ -170,6 +170,7 @@
     </fieldset>
 
     <button type="button" id="searchButton" class="primary">この条件で探す</button>
+    <button type="button" id="clearCriteriaButton" class="secondary" style="width:100%;margin-top:8px;">条件をクリア</button>
   </form>
 
   <div id="results"></div>
@@ -932,6 +933,13 @@ document.getElementById('searchButton').addEventListener('click', () => {
   document.getElementById('results').innerHTML = ranked.length > 0
     ? ranked.map(renderResultCard).join('')
     : '<p class="muted">条件に合う商品が見つかりませんでした。条件を減らしてお試しください。</p>';
+});
+
+document.getElementById('clearCriteriaButton').addEventListener('click', () => {
+  document.getElementById('criteriaForm').querySelectorAll('input[type="checkbox"]').forEach((el) => { el.checked = false; });
+  document.getElementById('pairingFreeText').value = '';
+  updateRegionField();
+  document.getElementById('results').innerHTML = '';
 });
 
 // ---------- 一覧タブ ----------
