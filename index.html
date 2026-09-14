@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>ワインおすすめ提示ツール</title>
+<title>繝ｯ繧､繝ｳ縺翫☆縺吶ａ謠千､ｺ繝・・繝ｫ</title>
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="ワインおすすめ">
+<meta name="apple-mobile-web-app-title" content="繝ｯ繧､繝ｳ縺翫☆縺吶ａ">
 <meta name="theme-color" content="#6b1e3f">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <style>
@@ -62,7 +62,7 @@
   .card.wine-red { border-left-color: var(--red-swatch); }
   .card.wine-white { border-left-color: var(--white-swatch); }
   .card.wine-rose { border-left-color: var(--rose-swatch); }
-  .card.wine-sparkling { border-left-color: var(--sparkling-swatch); }
+  .card.wine-sparkling { border-right: 4px solid var(--sparkling-swatch); }
   .card h3 { margin: 0 0 6px 0; font-size: 16px; display: flex; align-items: center; gap: 6px; }
   .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08); }
   .swatch.wine-red { background: var(--red-swatch); }
@@ -114,189 +114,187 @@
 
 <div id="authGate">
   <div class="authBox">
-    <h2>スタッフパスコード</h2>
-    <p class="muted">この先は店舗スタッフ専用です。パスコードを入力してください。</p>
-    <input type="password" id="authPasscode" placeholder="パスコード">
-    <button type="button" id="authButton" class="primary">開く</button>
+    <h2>繧ｹ繧ｿ繝・ヵ繝代せ繧ｳ繝ｼ繝・/h2>
+    <p class="muted">縺薙・蜈医・蠎苓・繧ｹ繧ｿ繝・ヵ蟆ら畑縺ｧ縺吶ゅヱ繧ｹ繧ｳ繝ｼ繝峨ｒ蜈･蜉帙＠縺ｦ縺上□縺輔＞縲・/p>
+    <input type="password" id="authPasscode" placeholder="繝代せ繧ｳ繝ｼ繝・>
+    <button type="button" id="authButton" class="primary">髢九￥</button>
     <div id="authMsg"></div>
   </div>
 </div>
 
 <div id="appRoot" style="display:none;">
 
-<h1>ワインおすすめ提示ツール</h1>
+<h1>繝ｯ繧､繝ｳ縺翫☆縺吶ａ謠千､ｺ繝・・繝ｫ</h1>
 <div class="syncBar">
-  <span id="syncStatus">同期状況を確認中...</span>
-  <button type="button" id="syncButton" class="secondary" style="padding:4px 10px;font-size:12px;">今すぐ同期</button>
+  <span id="syncStatus">蜷梧悄迥ｶ豕√ｒ遒ｺ隱堺ｸｭ...</span>
+  <button type="button" id="syncButton" class="secondary" style="padding:4px 10px;font-size:12px;">莉翫☆縺仙酔譛・/button>
 </div>
 
 <div class="tabBar">
-  <button type="button" class="tabBtn active" data-tab="recommend">レコメンド</button>
-  <button type="button" class="tabBtn" data-tab="list">一覧</button>
-  <button type="button" class="tabBtn" data-tab="learn">学ぶ</button>
-  <button type="button" class="tabBtn" data-tab="admin">管理</button>
+  <button type="button" class="tabBtn active" data-tab="recommend">繝ｬ繧ｳ繝｡繝ｳ繝・/button>
+  <button type="button" class="tabBtn" data-tab="list">荳隕ｧ</button>
+  <button type="button" class="tabBtn" data-tab="learn">蟄ｦ縺ｶ</button>
+  <button type="button" class="tabBtn" data-tab="admin">邂｡逅・/button>
 </div>
 
 <section id="tab-recommend" class="tabPanel active">
   <form id="criteriaForm">
     <fieldset>
-      <legend>フリーワード検索（任意）</legend>
-      <input type="text" id="recommendFreeText" placeholder="商品名・産地・品種で検索">
+      <legend>繝輔Μ繝ｼ繝ｯ繝ｼ繝画､懃ｴ｢・井ｻｻ諢擾ｼ・/legend>
+      <input type="text" id="recommendFreeText" placeholder="蝠・刀蜷阪・逕｣蝨ｰ繝ｻ蜩∫ｨｮ縺ｧ讀懃ｴ｢">
     </fieldset>
 
     <fieldset>
-      <legend>料理ペアリング（カテゴリ）</legend>
+      <legend>譁咏炊繝壹い繝ｪ繝ｳ繧ｰ・医き繝・ざ繝ｪ・・/legend>
       <div id="pairingFields"></div>
-      <label style="display:block;">自由入力（例：ローストビーフ、刺身 など）
-        <input type="text" id="pairingFreeText" placeholder="料理名を入力">
+      <label style="display:block;">閾ｪ逕ｱ蜈･蜉幢ｼ井ｾ具ｼ壹Ο繝ｼ繧ｹ繝医ン繝ｼ繝輔∝絢霄ｫ 縺ｪ縺ｩ・・        <input type="text" id="pairingFreeText" placeholder="譁咏炊蜷阪ｒ蜈･蜉・>
       </label>
     </fieldset>
 
     <fieldset>
-      <legend>味わい</legend>
-      <div><b>甘辛度</b><div id="sweetnessFields"></div></div>
-      <div><b>ボディ</b><div id="bodyFields"></div></div>
-      <div><b>テイスト</b><div id="tasteTagFields"></div></div>
+      <legend>蜻ｳ繧上＞</legend>
+      <div><b>逕倩ｾ帛ｺｦ</b><div id="sweetnessFields"></div></div>
+      <div><b>繝懊ョ繧｣</b><div id="bodyFields"></div></div>
+      <div><b>繝・う繧ｹ繝・/b><div id="tasteTagFields"></div></div>
     </fieldset>
 
     <fieldset>
-      <legend>色</legend>
+      <legend>濶ｲ</legend>
       <div id="colorFields"></div>
+      <label style="display:block;margin-top:8px;"><input type="checkbox" id="sparklingOnly">繧ｹ繝代・繧ｯ繝ｪ繝ｳ繧ｰ縺ｮ縺ｿ陦ｨ遉ｺ</label>
     </fieldset>
 
     <fieldset>
-      <legend>産地・品種</legend>
-      <div><b>国</b><div id="countryFields"></div></div>
-      <div id="regionField"><b>地方</b><div id="regionFields"></div></div>
-      <div><b>品種</b><div id="varietyFields"></div></div>
+      <legend>逕｣蝨ｰ繝ｻ蜩∫ｨｮ</legend>
+      <div><b>蝗ｽ</b><div id="countryFields"></div></div>
+      <div id="regionField"><b>蝨ｰ譁ｹ</b><div id="regionFields"></div></div>
+      <div><b>蜩∫ｨｮ</b><div id="varietyFields"></div></div>
     </fieldset>
 
     <fieldset>
-      <legend>価格帯</legend>
+      <legend>萓｡譬ｼ蟶ｯ</legend>
       <div id="priceFields"></div>
-      <label style="display:block;margin-top:8px;">自由入力（入力時はチェックボックスより優先されます）
-        <div style="display:flex;align-items:center;gap:6px;">
-          <input type="number" id="priceMinInput" placeholder="下限" style="width:auto;flex:1;" min="0">
-          <span>円 〜</span>
-          <input type="number" id="priceMaxInput" placeholder="上限" style="width:auto;flex:1;" min="0">
-          <span>円</span>
+      <label style="display:block;margin-top:8px;">閾ｪ逕ｱ蜈･蜉幢ｼ亥・蜉帶凾縺ｯ繝√ぉ繝・け繝懊ャ繧ｯ繧ｹ繧医ｊ蜆ｪ蜈医＆繧後∪縺呻ｼ・        <div style="display:flex;align-items:center;gap:6px;">
+          <input type="number" id="priceMinInput" placeholder="荳矩剞" style="width:auto;flex:1;" min="0">
+          <span>蜀・縲・/span>
+          <input type="number" id="priceMaxInput" placeholder="荳企剞" style="width:auto;flex:1;" min="0">
+          <span>蜀・/span>
         </div>
       </label>
     </fieldset>
 
-    <button type="button" id="searchButton" class="primary">この条件で探す</button>
-    <button type="button" id="clearCriteriaButton" class="secondary" style="width:100%;margin-top:8px;">条件をクリア</button>
+    <button type="button" id="searchButton" class="primary">縺薙・譚｡莉ｶ縺ｧ謗｢縺・/button>
+    <button type="button" id="clearCriteriaButton" class="secondary" style="width:100%;margin-top:8px;">譚｡莉ｶ繧偵け繝ｪ繧｢</button>
   </form>
 
   <div id="results"></div>
 </section>
 
 <section id="tab-list" class="tabPanel">
-  <input type="text" id="listSearch" placeholder="商品名・産地・品種で検索">
+  <input type="text" id="listSearch" placeholder="蝠・刀蜷阪・逕｣蝨ｰ繝ｻ蜩∫ｨｮ縺ｧ讀懃ｴ｢">
   <div id="listResults"></div>
 </section>
 
 <section id="tab-learn" class="tabPanel">
-  <p class="muted">接客中に説明に困りやすい基本用語をまとめました。</p>
+  <p class="muted">謗･螳｢荳ｭ縺ｫ隱ｬ譏弱↓蝗ｰ繧翫ｄ縺吶＞蝓ｺ譛ｬ逕ｨ隱槭ｒ縺ｾ縺ｨ繧√∪縺励◆縲・/p>
 
   <div class="card">
-    <h3>ボディ</h3>
-    <div class="meta">口に含んだときの重さ・飲みごたえのこと。「軽め」はさらっと軽快、「重め」は濃厚でしっかりした飲み応え。一般に、アルコール度数や渋み・凝縮感が強いほどボディは重くなる傾向がある。</div>
+    <h3>繝懊ョ繧｣</h3>
+    <div class="meta">蜿｣縺ｫ蜷ｫ繧薙□縺ｨ縺阪・驥阪＆繝ｻ鬟ｲ縺ｿ縺斐◆縺医・縺薙→縲ゅ瑚ｻｽ繧√阪・縺輔ｉ縺｣縺ｨ霆ｽ蠢ｫ縲√碁㍾繧√阪・豼・字縺ｧ縺励▲縺九ｊ縺励◆鬟ｲ縺ｿ蠢懊∴縲ゆｸ闊ｬ縺ｫ縲√い繝ｫ繧ｳ繝ｼ繝ｫ蠎ｦ謨ｰ繧・ｸ九∩繝ｻ蜃晉ｸｮ諢溘′蠑ｷ縺・⊇縺ｩ繝懊ョ繧｣縺ｯ驥阪￥縺ｪ繧句だ蜷代′縺ゅｋ縲・/div>
   </div>
 
   <div class="card">
-    <h3>タンニン</h3>
-    <div class="meta">主に赤ワインに含まれる渋み成分。ブドウの皮や種、樽由来で生まれる。タンニンが強いワインは「渋め」「しっかりした」と表現され、脂の多い肉料理などと好相性。白ワインにはほとんど含まれない。</div>
+    <h3>繧ｿ繝ｳ繝九Φ</h3>
+    <div class="meta">荳ｻ縺ｫ襍､繝ｯ繧､繝ｳ縺ｫ蜷ｫ縺ｾ繧後ｋ貂九∩謌仙・縲ゅヶ繝峨え縺ｮ逧ｮ繧・ｨｮ縲∵ｨｽ逕ｱ譚･縺ｧ逕溘∪繧後ｋ縲ゅち繝ｳ繝九Φ縺悟ｼｷ縺・Ρ繧､繝ｳ縺ｯ縲梧ｸ九ａ縲阪後＠縺｣縺九ｊ縺励◆縲阪→陦ｨ迴ｾ縺輔ｌ縲∬р縺ｮ螟壹＞閧画侭逅・↑縺ｩ縺ｨ螂ｽ逶ｸ諤ｧ縲ら區繝ｯ繧､繝ｳ縺ｫ縺ｯ縺ｻ縺ｨ繧薙←蜷ｫ縺ｾ繧後↑縺・・/div>
   </div>
 
   <div class="card">
-    <h3>酸味</h3>
-    <div class="meta">ワインのフレッシュさ・キレを感じさせる要素。酸味が強いと「爽やか」「シャープ」、弱いと「まろやか」と表現される。酸味の強いワインは、油分の多い料理や魚介と合わせやすい。</div>
+    <h3>驟ｸ蜻ｳ</h3>
+    <div class="meta">繝ｯ繧､繝ｳ縺ｮ繝輔Ξ繝・す繝･縺輔・繧ｭ繝ｬ繧呈─縺倥＆縺帙ｋ隕∫ｴ縲る・蜻ｳ縺悟ｼｷ縺・→縲檎或繧・°縲阪後す繝｣繝ｼ繝励阪∝ｼｱ縺・→縲後∪繧阪ｄ縺九阪→陦ｨ迴ｾ縺輔ｌ繧九る・蜻ｳ縺ｮ蠑ｷ縺・Ρ繧､繝ｳ縺ｯ縲∵ｲｹ蛻・・螟壹＞譁咏炊繧・ｭ壻ｻ九→蜷医ｏ縺帙ｄ縺吶＞縲・/div>
   </div>
 
   <div class="card">
-    <h3>甘辛度（辛口〜甘口）</h3>
-    <div class="meta">残糖（発酵しきらずに残った糖分）の量によって決まる甘さの度合い。「辛口」は糖分がほぼ残らずすっきり、「甘口」は糖分が多く残り甘さを感じる。食中酒には辛口〜中口が選ばれやすい。</div>
+    <h3>逕倩ｾ帛ｺｦ・郁ｾ帛哨縲懃曝蜿｣・・/h3>
+    <div class="meta">谿狗ｳ厄ｼ育匱驟ｵ縺励″繧峨★縺ｫ谿九▲縺溽ｳ門・・峨・驥上↓繧医▲縺ｦ豎ｺ縺ｾ繧狗曝縺輔・蠎ｦ蜷医＞縲ゅ瑚ｾ帛哨縲阪・邉門・縺後⊇縺ｼ谿九ｉ縺壹☆縺｣縺阪ｊ縲√檎曝蜿｣縲阪・邉門・縺悟､壹￥谿九ｊ逕倥＆繧呈─縺倥ｋ縲る｣滉ｸｭ驟偵↓縺ｯ霎帛哨縲應ｸｭ蜿｣縺碁∈縺ｰ繧後ｄ縺吶＞縲・/div>
   </div>
 
   <div class="card">
-    <h3>ブドウ品種とは</h3>
-    <div class="meta">ワインの原料になるブドウの種類。品種によって色・香り・味わいの傾向が大きく変わる。同じ産地でも品種が違えば味は別物になるため、「品種名」はお客様の好みを推測する手がかりになる。</div>
+    <h3>繝悶ラ繧ｦ蜩∫ｨｮ縺ｨ縺ｯ</h3>
+    <div class="meta">繝ｯ繧､繝ｳ縺ｮ蜴滓侭縺ｫ縺ｪ繧九ヶ繝峨え縺ｮ遞ｮ鬘槭ょ刀遞ｮ縺ｫ繧医▲縺ｦ濶ｲ繝ｻ鬥吶ｊ繝ｻ蜻ｳ繧上＞縺ｮ蛯ｾ蜷代′螟ｧ縺阪￥螟峨ｏ繧九ょ酔縺倡肇蝨ｰ縺ｧ繧ょ刀遞ｮ縺碁＆縺医・蜻ｳ縺ｯ蛻･迚ｩ縺ｫ縺ｪ繧九◆繧√√悟刀遞ｮ蜷阪阪・縺雁ｮ｢讒倥・螂ｽ縺ｿ繧呈耳貂ｬ縺吶ｋ謇九′縺九ｊ縺ｫ縺ｪ繧九・/div>
   </div>
 
   <div class="card">
-    <h3>産地・地方の読み方の基本</h3>
-    <div class="meta">「国」の下に「地方（例：ボルドー、トスカーナ）」があり、同じ国でも地方によって気候や土壌が異なるため味わいの傾向も変わる。産地名だけでも、ある程度どんな味わいかの見当をつけられる。</div>
+    <h3>逕｣蝨ｰ繝ｻ蝨ｰ譁ｹ縺ｮ隱ｭ縺ｿ譁ｹ縺ｮ蝓ｺ譛ｬ</h3>
+    <div class="meta">縲悟嵜縲阪・荳九↓縲悟慍譁ｹ・井ｾ具ｼ壹・繝ｫ繝峨・縲√ヨ繧ｹ繧ｫ繝ｼ繝奇ｼ峨阪′縺ゅｊ縲∝酔縺伜嵜縺ｧ繧ょ慍譁ｹ縺ｫ繧医▲縺ｦ豌怜吶ｄ蝨溷｣後′逡ｰ縺ｪ繧九◆繧∝袖繧上＞縺ｮ蛯ｾ蜷代ｂ螟峨ｏ繧九ら肇蝨ｰ蜷阪□縺代〒繧ゅ√≠繧狗ｨ句ｺｦ縺ｩ繧薙↑蜻ｳ繧上＞縺九・隕句ｽ薙ｒ縺､縺代ｉ繧後ｋ縲・/div>
   </div>
 
   <div class="card">
-    <h3>スワリング・デキャンタージュ</h3>
-    <div class="meta">スワリングはグラスを回して香りを立たせる所作。デキャンタージュは別容器に移し替えて空気に触れさせ、香りを開かせたり澱を取り除いたりすること。若く渋みの強い赤ワインなどで効果が出やすい。</div>
+    <h3>繧ｹ繝ｯ繝ｪ繝ｳ繧ｰ繝ｻ繝・く繝｣繝ｳ繧ｿ繝ｼ繧ｸ繝･</h3>
+    <div class="meta">繧ｹ繝ｯ繝ｪ繝ｳ繧ｰ縺ｯ繧ｰ繝ｩ繧ｹ繧貞屓縺励※鬥吶ｊ繧堤ｫ九◆縺帙ｋ謇菴懊ゅョ繧ｭ繝｣繝ｳ繧ｿ繝ｼ繧ｸ繝･縺ｯ蛻･螳ｹ蝎ｨ縺ｫ遘ｻ縺玲崛縺医※遨ｺ豌励↓隗ｦ繧後＆縺帙・ｦ吶ｊ繧帝幕縺九○縺溘ｊ貔ｱ繧貞叙繧企勁縺・◆繧翫☆繧九％縺ｨ縲り凶縺乗ｸ九∩縺ｮ蠑ｷ縺・ｵ､繝ｯ繧､繝ｳ縺ｪ縺ｩ縺ｧ蜉ｹ譫懊′蜃ｺ繧・☆縺・・/div>
   </div>
 </section>
 
 <section id="tab-admin" class="tabPanel">
   <div id="adminGate">
-    <p class="muted">追加・価格改定・取扱終了の操作には、閲覧用とは別の管理パスコードが必要です。</p>
-    <input type="password" id="adminPasscode" placeholder="管理パスコード">
-    <button type="button" id="adminUnlockButton" class="secondary">管理画面を開く</button>
+    <p class="muted">霑ｽ蜉繝ｻ萓｡譬ｼ謾ｹ螳壹・蜿匁桶邨ゆｺ・・謫堺ｽ懊↓縺ｯ縲・夢隕ｧ逕ｨ縺ｨ縺ｯ蛻･縺ｮ邂｡逅・ヱ繧ｹ繧ｳ繝ｼ繝峨′蠢・ｦ√〒縺吶・/p>
+    <input type="password" id="adminPasscode" placeholder="邂｡逅・ヱ繧ｹ繧ｳ繝ｼ繝・>
+    <button type="button" id="adminUnlockButton" class="secondary">邂｡逅・判髱｢繧帝幕縺・/button>
   </div>
 
   <div id="adminBody">
     <div id="adminMsg"></div>
 
     <fieldset>
-      <legend>新商品を追加</legend>
-      <label>商品名<input type="text" id="admName"></label>
-      <label>生産者<input type="text" id="admProducer"></label>
-      <label>販売価格（円）<input type="number" id="admPrice"></label>
-      <label>容量（例：750ml）<input type="text" id="admSize"></label>
-      <label>色
+      <legend>譁ｰ蝠・刀繧定ｿｽ蜉</legend>
+      <label>蝠・刀蜷・input type="text" id="admName"></label>
+      <label>逕溽肇閠・input type="text" id="admProducer"></label>
+      <label>雋ｩ螢ｲ萓｡譬ｼ・亥・・・input type="number" id="admPrice"></label>
+      <label>螳ｹ驥擾ｼ井ｾ具ｼ・50ml・・input type="text" id="admSize"></label>
+      <label>濶ｲ
         <select id="admColor"></select>
       </label>
-      <label>国<input type="text" id="admCountry" placeholder="例：フランス"></label>
-      <label>地方（任意）<input type="text" id="admRegion"></label>
-      <label>品種（カンマ区切り・任意）<input type="text" id="admVarieties"></label>
-      <div><b>甘辛度（複数選択可）</b><div id="admSweetnessFields"></div></div>
-      <div><b>ボディ（複数選択可）</b><div id="admBodyFields"></div></div>
-      <label>テイストタグ（カンマ区切り・任意）<input type="text" id="admTasteTags"></label>
-      <label>ペアリングタグ（カンマ区切り・任意）<input type="text" id="admPairingTags"></label>
-      <label>接客トーク素材（豆知識・任意）<input type="text" id="admTrivia"></label>
-      <button type="button" id="admAddButton" class="primary">この内容で追加</button>
+      <label><input type="checkbox" id="admSparkling">繧ｹ繝代・繧ｯ繝ｪ繝ｳ繧ｰ</label>
+      <label>蝗ｽ<input type="text" id="admCountry" placeholder="萓具ｼ壹ヵ繝ｩ繝ｳ繧ｹ"></label>
+      <label>蝨ｰ譁ｹ・井ｻｻ諢擾ｼ・input type="text" id="admRegion"></label>
+      <label>蜩∫ｨｮ・医き繝ｳ繝槫玄蛻・ｊ繝ｻ莉ｻ諢擾ｼ・input type="text" id="admVarieties"></label>
+      <div><b>逕倩ｾ帛ｺｦ・郁､・焚驕ｸ謚槫庄・・/b><div id="admSweetnessFields"></div></div>
+      <div><b>繝懊ョ繧｣・郁､・焚驕ｸ謚槫庄・・/b><div id="admBodyFields"></div></div>
+      <label>繝・う繧ｹ繝医ち繧ｰ・医き繝ｳ繝槫玄蛻・ｊ繝ｻ莉ｻ諢擾ｼ・input type="text" id="admTasteTags"></label>
+      <label>繝壹い繝ｪ繝ｳ繧ｰ繧ｿ繧ｰ・医き繝ｳ繝槫玄蛻・ｊ繝ｻ莉ｻ諢擾ｼ・input type="text" id="admPairingTags"></label>
+      <label>謗･螳｢繝医・繧ｯ邏譚撰ｼ郁ｱ・衍隴倥・莉ｻ諢擾ｼ・input type="text" id="admTrivia"></label>
+      <button type="button" id="admAddButton" class="primary">縺薙・蜀・ｮｹ縺ｧ霑ｽ蜉</button>
     </fieldset>
 
     <fieldset>
-      <legend>価格改定</legend>
-      <label>対象商品
+      <legend>萓｡譬ｼ謾ｹ螳・/legend>
+      <label>蟇ｾ雎｡蝠・刀
         <select id="admPriceTarget"></select>
       </label>
-      <label>新しい販売価格（円）<input type="number" id="admNewPrice"></label>
-      <button type="button" id="admPriceButton" class="primary">価格を更新</button>
+      <label>譁ｰ縺励＞雋ｩ螢ｲ萓｡譬ｼ・亥・・・input type="number" id="admNewPrice"></label>
+      <button type="button" id="admPriceButton" class="primary">萓｡譬ｼ繧呈峩譁ｰ</button>
     </fieldset>
 
     <fieldset>
-      <legend>取扱終了 / 再開</legend>
-      <label>取扱終了にする商品
+      <legend>蜿匁桶邨ゆｺ・/ 蜀埼幕</legend>
+      <label>蜿匁桶邨ゆｺ・↓縺吶ｋ蝠・刀
         <select id="admDiscontinueTarget"></select>
       </label>
-      <button type="button" id="admDiscontinueButton" class="secondary">取扱終了にする</button>
+      <button type="button" id="admDiscontinueButton" class="secondary">蜿匁桶邨ゆｺ・↓縺吶ｋ</button>
 
-      <label>取扱を再開する商品
-        <select id="admReactivateTarget"></select>
+      <label>蜿匁桶繧貞・髢九☆繧句膚蜩・        <select id="admReactivateTarget"></select>
       </label>
-      <button type="button" id="admReactivateButton" class="secondary">取扱を再開する</button>
+      <button type="button" id="admReactivateButton" class="secondary">蜿匁桶繧貞・髢九☆繧・/button>
 
       <hr style="margin:16px 0;">
 
-      <label>完全に削除する商品（取扱終了中のみ）
-        <select id="admDeleteTarget"></select>
+      <label>螳悟・縺ｫ蜑企勁縺吶ｋ蝠・刀・亥叙謇ｱ邨ゆｺ・ｸｭ縺ｮ縺ｿ・・        <select id="admDeleteTarget"></select>
       </label>
-      <button type="button" id="admDeleteButton" class="secondary">完全に削除する</button>
+      <button type="button" id="admDeleteButton" class="secondary">螳悟・縺ｫ蜑企勁縺吶ｋ</button>
 
       <div id="admDeleteConfirm" class="hidden" style="border:2px solid #b3261e;border-radius:8px;padding:10px;margin-top:8px;">
-        <p><b id="admDeleteConfirmName"></b> を完全に削除します。<br>この操作は元に戻せません。よろしいですか？</p>
-        <button type="button" id="admDeleteConfirmButton" class="secondary" style="color:#b3261e;">はい、完全に削除する</button>
-        <button type="button" id="admDeleteCancelButton" class="secondary">キャンセル</button>
+        <p><b id="admDeleteConfirmName"></b> 繧貞ｮ悟・縺ｫ蜑企勁縺励∪縺吶・br>縺薙・謫堺ｽ懊・蜈・↓謌ｻ縺帙∪縺帙ｓ縲ゅｈ繧阪＠縺・〒縺吶°・・/p>
+        <button type="button" id="admDeleteConfirmButton" class="secondary" style="color:#b3261e;">縺ｯ縺・∝ｮ悟・縺ｫ蜑企勁縺吶ｋ</button>
+        <button type="button" id="admDeleteCancelButton" class="secondary">繧ｭ繝｣繝ｳ繧ｻ繝ｫ</button>
       </div>
     </fieldset>
   </div>
@@ -305,68 +303,62 @@
 <div id="detailOverlay" class="overlay hidden">
   <div class="sheet">
     <div id="detailContent"></div>
-    <button type="button" id="detailCloseButton" class="secondary closeBtn">閉じる</button>
+    <button type="button" id="detailCloseButton" class="secondary closeBtn">髢峨§繧・/button>
   </div>
 </div>
 
 </div>
 
 <script>
-// 02_酒部門/ワインおすすめツール/scoring.js
-// 選択肢の定義とマッチングロジック（純粋関数）。
-// build.js でこのファイルの中身がそのまま index.html に埋め込まれるため、
-// ブラウザ・Node.js のどちらでも動く形（ファイル末尾のエクスポート文のみ Node 依存）にしてある。
-
+// 02_驟帝Κ髢/繝ｯ繧､繝ｳ縺翫☆縺吶ａ繝・・繝ｫ/scoring.js
+// 驕ｸ謚櫁い縺ｮ螳夂ｾｩ縺ｨ繝槭ャ繝√Φ繧ｰ繝ｭ繧ｸ繝・け・育ｴ皮ｲ矩未謨ｰ・峨・// build.js 縺ｧ縺薙・繝輔ぃ繧､繝ｫ縺ｮ荳ｭ霄ｫ縺後◎縺ｮ縺ｾ縺ｾ index.html 縺ｫ蝓九ａ霎ｼ縺ｾ繧後ｋ縺溘ａ縲・// 繝悶Λ繧ｦ繧ｶ繝ｻNode.js 縺ｮ縺ｩ縺｡繧峨〒繧ょ虚縺丞ｽ｢・医ヵ繧｡繧､繝ｫ譛ｫ蟆ｾ縺ｮ繧ｨ繧ｯ繧ｹ繝昴・繝域枚縺ｮ縺ｿ Node 萓晏ｭ假ｼ峨↓縺励※縺ゅｋ縲・
 const PRICE_BANDS = [
-  { id: 'under2000', label: '〜2,000円', min: 0, max: 2000 },
-  { id: '2000to4000', label: '2,000〜4,000円', min: 2000, max: 4000 },
-  { id: '4000to8000', label: '4,000〜8,000円', min: 4000, max: 8000 },
-  { id: 'over8000', label: '8,000円〜', min: 8000, max: Infinity },
+  { id: 'under2000', label: '縲・,000蜀・, min: 0, max: 2000 },
+  { id: '2000to4000', label: '2,000縲・,000蜀・, min: 2000, max: 4000 },
+  { id: '4000to8000', label: '4,000縲・,000蜀・, min: 4000, max: 8000 },
+  { id: 'over8000', label: '8,000蜀・・, min: 8000, max: Infinity },
 ];
 
-const COLORS = ['赤', '白', 'ロゼ', 'スパークリング'];
+const COLORS = ['襍､', '逋ｽ', '繝ｭ繧ｼ'];
 
-const COUNTRIES = ['フランス', 'イタリア', 'スペイン', 'ドイツ', '日本', 'チリ', 'アメリカ', 'オーストラリア', 'その他'];
+const COUNTRIES = ['繝輔Λ繝ｳ繧ｹ', '繧､繧ｿ繝ｪ繧｢', '繧ｹ繝壹う繝ｳ', '繝峨う繝・, '譌･譛ｬ', '繝√Μ', '繧｢繝｡繝ｪ繧ｫ', '繧ｪ繝ｼ繧ｹ繝医Λ繝ｪ繧｢', '縺昴・莉・];
 
-// 国 → 地方（プルダウンの絞り込み表示に使う。ウイスキーツールの「スコットランド選択時のみ地方欄を表示」と同じ考え方）
-const REGIONS_BY_COUNTRY = {
-  フランス: ['ボルドー', 'ブルゴーニュ', 'シャンパーニュ', 'ロワール', 'ローヌ'],
-  イタリア: ['トスカーナ', 'ピエモンテ', 'ヴェネト'],
-  スペイン: ['リオハ', 'カタルーニャ'],
-  日本: ['山梨', '長野', '北海道'],
+// 蝗ｽ 竊・蝨ｰ譁ｹ・医・繝ｫ繝繧ｦ繝ｳ縺ｮ邨槭ｊ霎ｼ縺ｿ陦ｨ遉ｺ縺ｫ菴ｿ縺・ゅえ繧､繧ｹ繧ｭ繝ｼ繝・・繝ｫ縺ｮ縲後せ繧ｳ繝・ヨ繝ｩ繝ｳ繝蛾∈謚樊凾縺ｮ縺ｿ蝨ｰ譁ｹ谺・ｒ陦ｨ遉ｺ縲阪→蜷後§閠・∴譁ｹ・・const REGIONS_BY_COUNTRY = {
+  繝輔Λ繝ｳ繧ｹ: ['繝懊Ν繝峨・', '繝悶Ν繧ｴ繝ｼ繝九Η', '繧ｷ繝｣繝ｳ繝代・繝九Η', '繝ｭ繝ｯ繝ｼ繝ｫ', '繝ｭ繝ｼ繝・],
+  繧､繧ｿ繝ｪ繧｢: ['繝医せ繧ｫ繝ｼ繝・, '繝斐お繝｢繝ｳ繝・, '繝ｴ繧ｧ繝阪ヨ'],
+  繧ｹ繝壹う繝ｳ: ['繝ｪ繧ｪ繝・, '繧ｫ繧ｿ繝ｫ繝ｼ繝九Ε'],
+  譌･譛ｬ: ['螻ｱ譴ｨ', '髟ｷ驥・, '蛹玲ｵｷ驕・],
 };
 
 const VARIETIES = [
-  'シャルドネ', 'ソーヴィニヨン・ブラン', 'リースリング',
-  'カベルネ・ソーヴィニヨン', 'メルロー', 'ピノ・ノワール', 'シラー', 'サンジョヴェーゼ', 'テンプラニーリョ',
+  '繧ｷ繝｣繝ｫ繝峨ロ', '繧ｽ繝ｼ繝ｴ繧｣繝九Κ繝ｳ繝ｻ繝悶Λ繝ｳ', '繝ｪ繝ｼ繧ｹ繝ｪ繝ｳ繧ｰ',
+  '繧ｫ繝吶Ν繝阪・繧ｽ繝ｼ繝ｴ繧｣繝九Κ繝ｳ', '繝｡繝ｫ繝ｭ繝ｼ', '繝斐ヮ繝ｻ繝弱Ρ繝ｼ繝ｫ', '繧ｷ繝ｩ繝ｼ', '繧ｵ繝ｳ繧ｸ繝ｧ繝ｴ繧ｧ繝ｼ繧ｼ', '繝・Φ繝励Λ繝九・繝ｪ繝ｧ',
 ];
 
-const SWEETNESS_LEVELS = ['辛口', 'やや辛口', '中口', 'やや甘口', '甘口'];
+const SWEETNESS_LEVELS = ['霎帛哨', '繧・ｄ霎帛哨', '荳ｭ蜿｣', '繧・ｄ逕伜哨', '逕伜哨'];
 
-const BODY_LEVELS = ['軽め', 'ミディアム', '重め'];
+const BODY_LEVELS = ['霆ｽ繧・, '繝溘ョ繧｣繧｢繝', '驥阪ａ'];
 
 const TASTE_TAGS = [
-  'フルーティ', '酸味が爽やか', 'スパイシー', 'ミネラル感', 'なめらか（タンニン控えめ）', 'しっかりタンニン',
+  '繝輔Ν繝ｼ繝・ぅ', '驟ｸ蜻ｳ縺檎或繧・°', '繧ｹ繝代う繧ｷ繝ｼ', '繝溘ロ繝ｩ繝ｫ諢・, '縺ｪ繧√ｉ縺具ｼ医ち繝ｳ繝九Φ謗ｧ縺医ａ・・, '縺励▲縺九ｊ繧ｿ繝ｳ繝九Φ',
 ];
 
 const PAIRING_TAGS = [
-  '牛肉・赤身肉', '豚肉・鶏肉', '魚介・カルパッチョ', '寿司・刺身',
-  'チーズ', 'パスタ・トマト系', '和食全般', 'デザート・甘味', '前菜・軽い料理',
+  '迚幄ｉ繝ｻ襍､霄ｫ閧・, '雎夊ｉ繝ｻ鮓剰ｉ', '鬲壻ｻ九・繧ｫ繝ｫ繝代ャ繝√Ι', '蟇ｿ蜿ｸ繝ｻ蛻ｺ霄ｫ',
+  '繝√・繧ｺ', '繝代せ繧ｿ繝ｻ繝医・繝育ｳｻ', '蜥碁｣溷・闊ｬ', '繝・じ繝ｼ繝医・逕伜袖', '蜑崎除繝ｻ霆ｽ縺・侭逅・,
 ];
 
-// 自由テキスト入力 → ペアリングタグ変換用キーワード辞書
-// キーは料理名・食材名の代表的な表記、値は対応するペアリングタグ。
-// 辞書にない語は呼び出し側で主要キーワードの部分一致にフォールバックする。
-const PAIRING_KEYWORD_DICTIONARY = {
-  'ローストビーフ': '牛肉・赤身肉', 'ステーキ': '牛肉・赤身肉', '牛肉': '牛肉・赤身肉', '焼肉': '牛肉・赤身肉',
-  '豚肉': '豚肉・鶏肉', '唐揚げ': '豚肉・鶏肉', '鶏肉': '豚肉・鶏肉', 'チキン': '豚肉・鶏肉', '生姜焼き': '豚肉・鶏肉',
-  'カルパッチョ': '魚介・カルパッチョ', '白身魚': '魚介・カルパッチョ', 'エビ': '魚介・カルパッチョ', '貝': '魚介・カルパッチョ',
-  '刺身': '寿司・刺身', '寿司': '寿司・刺身', 'すし': '寿司・刺身',
-  'チーズ': 'チーズ',
-  'パスタ': 'パスタ・トマト系', 'ピザ': 'パスタ・トマト系', 'トマト': 'パスタ・トマト系',
-  '天ぷら': '和食全般', '煮物': '和食全般', '焼き魚': '和食全般', '和食': '和食全般', 'すき焼き': '和食全般',
-  'デザート': 'デザート・甘味', 'ケーキ': 'デザート・甘味', 'チョコレート': 'デザート・甘味', '果物': 'デザート・甘味',
-  '前菜': '前菜・軽い料理', 'サラダ': '前菜・軽い料理',
+// 閾ｪ逕ｱ繝・く繧ｹ繝亥・蜉・竊・繝壹い繝ｪ繝ｳ繧ｰ繧ｿ繧ｰ螟画鋤逕ｨ繧ｭ繝ｼ繝ｯ繝ｼ繝芽ｾ樊嶌
+// 繧ｭ繝ｼ縺ｯ譁咏炊蜷阪・鬟滓攝蜷阪・莉｣陦ｨ逧・↑陦ｨ險倥∝､縺ｯ蟇ｾ蠢懊☆繧九・繧｢繝ｪ繝ｳ繧ｰ繧ｿ繧ｰ縲・// 霎樊嶌縺ｫ縺ｪ縺・ｪ槭・蜻ｼ縺ｳ蜃ｺ縺怜・縺ｧ荳ｻ隕√く繝ｼ繝ｯ繝ｼ繝峨・驛ｨ蛻・ｸ閾ｴ縺ｫ繝輔か繝ｼ繝ｫ繝舌ャ繧ｯ縺吶ｋ縲・const PAIRING_KEYWORD_DICTIONARY = {
+  '繝ｭ繝ｼ繧ｹ繝医ン繝ｼ繝・: '迚幄ｉ繝ｻ襍､霄ｫ閧・, '繧ｹ繝・・繧ｭ': '迚幄ｉ繝ｻ襍､霄ｫ閧・, '迚幄ｉ': '迚幄ｉ繝ｻ襍､霄ｫ閧・, '辟ｼ閧・: '迚幄ｉ繝ｻ襍､霄ｫ閧・,
+  '雎夊ｉ': '雎夊ｉ繝ｻ鮓剰ｉ', '蜚先恕縺・: '雎夊ｉ繝ｻ鮓剰ｉ', '鮓剰ｉ': '雎夊ｉ繝ｻ鮓剰ｉ', '繝√く繝ｳ': '雎夊ｉ繝ｻ鮓剰ｉ', '逕溷ｧ懃┥縺・: '雎夊ｉ繝ｻ鮓剰ｉ',
+  '繧ｫ繝ｫ繝代ャ繝√Ι': '鬲壻ｻ九・繧ｫ繝ｫ繝代ャ繝√Ι', '逋ｽ霄ｫ鬲・: '鬲壻ｻ九・繧ｫ繝ｫ繝代ャ繝√Ι', '繧ｨ繝・: '鬲壻ｻ九・繧ｫ繝ｫ繝代ャ繝√Ι', '雋・: '鬲壻ｻ九・繧ｫ繝ｫ繝代ャ繝√Ι',
+  '蛻ｺ霄ｫ': '蟇ｿ蜿ｸ繝ｻ蛻ｺ霄ｫ', '蟇ｿ蜿ｸ': '蟇ｿ蜿ｸ繝ｻ蛻ｺ霄ｫ', '縺吶＠': '蟇ｿ蜿ｸ繝ｻ蛻ｺ霄ｫ',
+  '繝√・繧ｺ': '繝√・繧ｺ',
+  '繝代せ繧ｿ': '繝代せ繧ｿ繝ｻ繝医・繝育ｳｻ', '繝斐じ': '繝代せ繧ｿ繝ｻ繝医・繝育ｳｻ', '繝医・繝・: '繝代せ繧ｿ繝ｻ繝医・繝育ｳｻ',
+  '螟ｩ縺ｷ繧・: '蜥碁｣溷・闊ｬ', '辣ｮ迚ｩ': '蜥碁｣溷・闊ｬ', '辟ｼ縺埼ｭ・: '蜥碁｣溷・闊ｬ', '蜥碁｣・: '蜥碁｣溷・闊ｬ', '縺吶″辟ｼ縺・: '蜥碁｣溷・闊ｬ',
+  '繝・じ繝ｼ繝・: '繝・じ繝ｼ繝医・逕伜袖', '繧ｱ繝ｼ繧ｭ': '繝・じ繝ｼ繝医・逕伜袖', '繝√Ι繧ｳ繝ｬ繝ｼ繝・: '繝・じ繝ｼ繝医・逕伜袖', '譫懃黄': '繝・じ繝ｼ繝医・逕伜袖',
+  '蜑崎除': '蜑崎除繝ｻ霆ｽ縺・侭逅・, '繧ｵ繝ｩ繝': '蜑崎除繝ｻ霆ｽ縺・侭逅・,
 };
 
 function priceBandsForProduct(price) {
@@ -374,9 +366,7 @@ function priceBandsForProduct(price) {
   return PRICE_BANDS.filter((b) => price >= b.min && price < b.max).map((b) => b.id);
 }
 
-// 自由テキストをペアリングタグの配列に変換する。
-// 1) 辞書のキーを部分一致で探す 2) 見つからなければ何も返さない（呼び出し側でカテゴリ選択と合算する）
-function resolvePairingText(text) {
+// 閾ｪ逕ｱ繝・く繧ｹ繝医ｒ繝壹い繝ｪ繝ｳ繧ｰ繧ｿ繧ｰ縺ｮ驟榊・縺ｫ螟画鋤縺吶ｋ縲・// 1) 霎樊嶌縺ｮ繧ｭ繝ｼ繧帝Κ蛻・ｸ閾ｴ縺ｧ謗｢縺・2) 隕九▽縺九ｉ縺ｪ縺代ｌ縺ｰ菴輔ｂ霑斐＆縺ｪ縺・ｼ亥他縺ｳ蜃ｺ縺怜・縺ｧ繧ｫ繝・ざ繝ｪ驕ｸ謚槭→蜷育ｮ励☆繧具ｼ・function resolvePairingText(text) {
   if (!text) return [];
   const tags = new Set();
   Object.keys(PAIRING_KEYWORD_DICTIONARY).forEach((keyword) => {
@@ -423,6 +413,13 @@ function scoreProduct(product, criteria) {
     const matched = product.color != null && criteria.colors.includes(product.color);
     if (matched) matchedCount++;
     breakdown.color = matched;
+  }
+
+  if (criteria.sparklingOnly) {
+    totalCriteria++;
+    const matched = product.sparkling === true;
+    if (matched) matchedCount++;
+    breakdown.sparkling = matched;
   }
 
   if (criteria.countries && criteria.countries.length > 0) {
@@ -478,8 +475,7 @@ function scoreProduct(product, criteria) {
   return { score, matchedCount, totalCriteria, breakdown };
 }
 
-// 商品名・国・地方・品種を対象にした部分一致検索（一覧タブ・レコメンドタブ共通）
-function matchesFreeText(product, text) {
+// 蝠・刀蜷阪・蝗ｽ繝ｻ蝨ｰ譁ｹ繝ｻ蜩∫ｨｮ繧貞ｯｾ雎｡縺ｫ縺励◆驛ｨ蛻・ｸ閾ｴ讀懃ｴ｢・井ｸ隕ｧ繧ｿ繝悶・繝ｬ繧ｳ繝｡繝ｳ繝峨ち繝門・騾夲ｼ・function matchesFreeText(product, text) {
   if (!text) return true;
   return [product.name, product.country, product.region, ...(product.varieties || [])]
     .filter(Boolean).some((v) => v.includes(text));
@@ -498,23 +494,23 @@ function rankProducts(products, criteria, topN) {
 const SEED_PRODUCTS = [
   {
     "code": "SAMPLE-001",
-    "name": "（サンプル）シャブリ",
-    "producer": "サンプル生産者A",
+    "name": "・医し繝ｳ繝励Ν・峨す繝｣繝悶Μ",
+    "producer": "繧ｵ繝ｳ繝励Ν逕溽肇閠・",
     "price": 3500,
     "size": "750ml",
-    "color": "白",
-    "country": "フランス",
-    "region": "ブルゴーニュ",
-    "varieties": ["シャルドネ"],
-    "sweetness": ["辛口"],
-    "body": ["ミディアム"],
-    "tasteTags": ["ミネラル感", "酸味が爽やか"],
-    "pairingTags": ["魚介・カルパッチョ", "寿司・刺身", "前菜・軽い料理"],
+    "color": "逋ｽ",
+    "country": "繝輔Λ繝ｳ繧ｹ",
+    "region": "繝悶Ν繧ｴ繝ｼ繝九Η",
+    "varieties": ["繧ｷ繝｣繝ｫ繝峨ロ"],
+    "sweetness": ["霎帛哨"],
+    "body": ["繝溘ョ繧｣繧｢繝"],
+    "tasteTags": ["繝溘ロ繝ｩ繝ｫ諢・, "驟ｸ蜻ｳ縺檎或繧・°"],
+    "pairingTags": ["鬲壻ｻ九・繧ｫ繝ｫ繝代ャ繝√Ι", "蟇ｿ蜿ｸ繝ｻ蛻ｺ霄ｫ", "蜑崎除繝ｻ霆ｽ縺・侭逅・],
     "pairingReasons": {
-      "魚介・カルパッチョ": "キリッとした酸とミネラル感が魚介の旨みを引き立てます",
-      "寿司・刺身": "香りが控えめで生魚の繊細な風味を邪魔しません"
+      "鬲壻ｻ九・繧ｫ繝ｫ繝代ャ繝√Ι": "繧ｭ繝ｪ繝・→縺励◆驟ｸ縺ｨ繝溘ロ繝ｩ繝ｫ諢溘′鬲壻ｻ九・譌ｨ縺ｿ繧貞ｼ輔″遶九※縺ｾ縺・,
+      "蟇ｿ蜿ｸ繝ｻ蛻ｺ霄ｫ": "鬥吶ｊ縺梧而縺医ａ縺ｧ逕滄ｭ壹・郢顔ｴｰ縺ｪ鬚ｨ蜻ｳ繧帝が鬲斐＠縺ｾ縺帙ｓ"
     },
-    "trivia": "シャブリは牡蠣の産地としても知られ、地元では「牡蠣にはシャブリ」という組み合わせが定番です。",
+    "trivia": "繧ｷ繝｣繝悶Μ縺ｯ迚｡陟｣縺ｮ逕｣蝨ｰ縺ｨ縺励※繧ら衍繧峨ｌ縲∝慍蜈・〒縺ｯ縲檎横陟｣縺ｫ縺ｯ繧ｷ繝｣繝悶Μ縲阪→縺・≧邨・∩蜷医ｏ縺帙′螳夂分縺ｧ縺吶・,
     "nameConfidence": "high",
     "attributeConfidence": "high",
     "attributeSource": null,
@@ -522,22 +518,22 @@ const SEED_PRODUCTS = [
   },
   {
     "code": "SAMPLE-002",
-    "name": "（サンプル）ボルドー赤 メルロー主体",
-    "producer": "サンプル生産者B",
+    "name": "・医し繝ｳ繝励Ν・峨・繝ｫ繝峨・襍､ 繝｡繝ｫ繝ｭ繝ｼ荳ｻ菴・,
+    "producer": "繧ｵ繝ｳ繝励Ν逕溽肇閠・",
     "price": 4200,
     "size": "750ml",
-    "color": "赤",
-    "country": "フランス",
-    "region": "ボルドー",
-    "varieties": ["メルロー", "カベルネ・ソーヴィニヨン"],
-    "sweetness": ["辛口"],
-    "body": ["重め"],
-    "tasteTags": ["しっかりタンニン", "フルーティ"],
-    "pairingTags": ["牛肉・赤身肉", "チーズ"],
+    "color": "襍､",
+    "country": "繝輔Λ繝ｳ繧ｹ",
+    "region": "繝懊Ν繝峨・",
+    "varieties": ["繝｡繝ｫ繝ｭ繝ｼ", "繧ｫ繝吶Ν繝阪・繧ｽ繝ｼ繝ｴ繧｣繝九Κ繝ｳ"],
+    "sweetness": ["霎帛哨"],
+    "body": ["驥阪ａ"],
+    "tasteTags": ["縺励▲縺九ｊ繧ｿ繝ｳ繝九Φ", "繝輔Ν繝ｼ繝・ぅ"],
+    "pairingTags": ["迚幄ｉ繝ｻ襍､霄ｫ閧・, "繝√・繧ｺ"],
     "pairingReasons": {
-      "牛肉・赤身肉": "しっかりしたタンニンが赤身肉の脂と旨みに負けません"
+      "迚幄ｉ繝ｻ襍､霄ｫ閧・: "縺励▲縺九ｊ縺励◆繧ｿ繝ｳ繝九Φ縺瑚ｵ､霄ｫ閧峨・閼ゅ→譌ｨ縺ｿ縺ｫ雋縺代∪縺帙ｓ"
     },
-    "trivia": "ボルドー地方は複数品種をブレンドするのが伝統的なスタイルで、畑ごとに配合比率が異なります。",
+    "trivia": "繝懊Ν繝峨・蝨ｰ譁ｹ縺ｯ隍・焚蜩∫ｨｮ繧偵ヶ繝ｬ繝ｳ繝峨☆繧九・縺御ｼ晉ｵｱ逧・↑繧ｹ繧ｿ繧､繝ｫ縺ｧ縲∫舞縺斐→縺ｫ驟榊粋豈皮紫縺檎焚縺ｪ繧翫∪縺吶・,
     "nameConfidence": "high",
     "attributeConfidence": "high",
     "attributeSource": null,
@@ -545,22 +541,22 @@ const SEED_PRODUCTS = [
   },
   {
     "code": "SAMPLE-003",
-    "name": "（サンプル）キャンティ・クラシコ",
-    "producer": "サンプル生産者C",
+    "name": "・医し繝ｳ繝励Ν・峨く繝｣繝ｳ繝・ぅ繝ｻ繧ｯ繝ｩ繧ｷ繧ｳ",
+    "producer": "繧ｵ繝ｳ繝励Ν逕溽肇閠・",
     "price": 2800,
     "size": "750ml",
-    "color": "赤",
-    "country": "イタリア",
-    "region": "トスカーナ",
-    "varieties": ["サンジョヴェーゼ"],
-    "sweetness": ["辛口"],
-    "body": ["ミディアム"],
-    "tasteTags": ["酸味が爽やか", "フルーティ"],
-    "pairingTags": ["パスタ・トマト系", "牛肉・赤身肉"],
+    "color": "襍､",
+    "country": "繧､繧ｿ繝ｪ繧｢",
+    "region": "繝医せ繧ｫ繝ｼ繝・,
+    "varieties": ["繧ｵ繝ｳ繧ｸ繝ｧ繝ｴ繧ｧ繝ｼ繧ｼ"],
+    "sweetness": ["霎帛哨"],
+    "body": ["繝溘ョ繧｣繧｢繝"],
+    "tasteTags": ["驟ｸ蜻ｳ縺檎或繧・°", "繝輔Ν繝ｼ繝・ぅ"],
+    "pairingTags": ["繝代せ繧ｿ繝ｻ繝医・繝育ｳｻ", "迚幄ｉ繝ｻ襍､霄ｫ閧・],
     "pairingReasons": {
-      "パスタ・トマト系": "酸味の高さがトマトソースの酸と調和します"
+      "繝代せ繧ｿ繝ｻ繝医・繝育ｳｻ": "驟ｸ蜻ｳ縺ｮ鬮倥＆縺後ヨ繝槭ヨ繧ｽ繝ｼ繧ｹ縺ｮ驟ｸ縺ｨ隱ｿ蜥後＠縺ｾ縺・
     },
-    "trivia": "ラベルに黒い雄鶏（ガッロ・ネロ）のマークがあるものは、キャンティ・クラシコ生産者協会の認定品です。",
+    "trivia": "繝ｩ繝吶Ν縺ｫ鮟偵＞髮・ｶ擾ｼ医ぎ繝・Ο繝ｻ繝阪Ο・峨・繝槭・繧ｯ縺後≠繧九ｂ縺ｮ縺ｯ縲√く繝｣繝ｳ繝・ぅ繝ｻ繧ｯ繝ｩ繧ｷ繧ｳ逕溽肇閠・鵠莨壹・隱榊ｮ壼刀縺ｧ縺吶・,
     "nameConfidence": "high",
     "attributeConfidence": "high",
     "attributeSource": null,
@@ -568,22 +564,22 @@ const SEED_PRODUCTS = [
   },
   {
     "code": "SAMPLE-004",
-    "name": "（サンプル）甲州辛口",
-    "producer": "サンプル生産者D",
+    "name": "・医し繝ｳ繝励Ν・臥抜蟾櫁ｾ帛哨",
+    "producer": "繧ｵ繝ｳ繝励Ν逕溽肇閠・",
     "price": 2200,
     "size": "750ml",
-    "color": "白",
-    "country": "日本",
-    "region": "山梨",
+    "color": "逋ｽ",
+    "country": "譌･譛ｬ",
+    "region": "螻ｱ譴ｨ",
     "varieties": [],
-    "sweetness": ["辛口"],
-    "body": ["軽め"],
-    "tasteTags": ["ミネラル感", "酸味が爽やか"],
-    "pairingTags": ["寿司・刺身", "和食全般", "前菜・軽い料理"],
+    "sweetness": ["霎帛哨"],
+    "body": ["霆ｽ繧・],
+    "tasteTags": ["繝溘ロ繝ｩ繝ｫ諢・, "驟ｸ蜻ｳ縺檎或繧・°"],
+    "pairingTags": ["蟇ｿ蜿ｸ繝ｻ蛻ｺ霄ｫ", "蜥碁｣溷・闊ｬ", "蜑崎除繝ｻ霆ｽ縺・侭逅・],
     "pairingReasons": {
-      "和食全般": "繊細でクセがなく、出汁の風味を邪魔しない味わいです"
+      "蜥碁｣溷・闊ｬ": "郢顔ｴｰ縺ｧ繧ｯ繧ｻ縺後↑縺上∝・豎√・鬚ｨ蜻ｳ繧帝が鬲斐＠縺ｪ縺・袖繧上＞縺ｧ縺・
     },
-    "trivia": "甲州は日本固有のブドウ品種で、和食との相性を意識した造りが多いのが特徴です。",
+    "trivia": "逕ｲ蟾槭・譌･譛ｬ蝗ｺ譛峨・繝悶ラ繧ｦ蜩∫ｨｮ縺ｧ縲∝柱鬟溘→縺ｮ逶ｸ諤ｧ繧呈э隴倥＠縺滄繧翫′螟壹＞縺ｮ縺檎音蠕ｴ縺ｧ縺吶・,
     "nameConfidence": "high",
     "attributeConfidence": "medium",
     "attributeSource": null,
@@ -591,22 +587,22 @@ const SEED_PRODUCTS = [
   },
   {
     "code": "SAMPLE-005",
-    "name": "（サンプル）プロセッコ",
-    "producer": "サンプル生産者E",
+    "name": "・医し繝ｳ繝励Ν・峨・繝ｭ繧ｻ繝・さ",
+    "producer": "繧ｵ繝ｳ繝励Ν逕溽肇閠・",
     "price": 2500,
     "size": "750ml",
-    "color": "スパークリング",
-    "country": "イタリア",
-    "region": "ヴェネト",
+    "color": "繧ｹ繝代・繧ｯ繝ｪ繝ｳ繧ｰ",
+    "country": "繧､繧ｿ繝ｪ繧｢",
+    "region": "繝ｴ繧ｧ繝阪ヨ",
     "varieties": [],
-    "sweetness": ["やや辛口"],
-    "body": ["軽め"],
-    "tasteTags": ["フルーティ", "酸味が爽やか"],
-    "pairingTags": ["前菜・軽い料理", "チーズ"],
+    "sweetness": ["繧・ｄ霎帛哨"],
+    "body": ["霆ｽ繧・],
+    "tasteTags": ["繝輔Ν繝ｼ繝・ぅ", "驟ｸ蜻ｳ縺檎或繧・°"],
+    "pairingTags": ["蜑崎除繝ｻ霆ｽ縺・侭逅・, "繝√・繧ｺ"],
     "pairingReasons": {
-      "前菜・軽い料理": "軽やかな泡と果実感が食事の始まりにぴったりです"
+      "蜑崎除繝ｻ霆ｽ縺・侭逅・: "霆ｽ繧・°縺ｪ豕｡縺ｨ譫懷ｮ滓─縺碁｣滉ｺ九・蟋九∪繧翫↓縺ｴ縺｣縺溘ｊ縺ｧ縺・
     },
-    "trivia": "シャンパーニュと違い、大型タンクで二次発酵させる製法のため比較的リーズナブルに造られます。",
+    "trivia": "繧ｷ繝｣繝ｳ繝代・繝九Η縺ｨ驕輔＞縲∝､ｧ蝙九ち繝ｳ繧ｯ縺ｧ莠梧ｬ｡逋ｺ驟ｵ縺輔○繧玖｣ｽ豕輔・縺溘ａ豈碑ｼ・噪繝ｪ繝ｼ繧ｺ繝翫ヶ繝ｫ縺ｫ騾繧峨ｌ縺ｾ縺吶・,
     "nameConfidence": "high",
     "attributeConfidence": "high",
     "attributeSource": null,
@@ -614,22 +610,22 @@ const SEED_PRODUCTS = [
   },
   {
     "code": "SAMPLE-006",
-    "name": "（サンプル）シャンパーニュ ブリュット",
-    "producer": "サンプル生産者F",
+    "name": "・医し繝ｳ繝励Ν・峨す繝｣繝ｳ繝代・繝九Η 繝悶Μ繝･繝・ヨ",
+    "producer": "繧ｵ繝ｳ繝励Ν逕溽肇閠・",
     "price": 8500,
     "size": "750ml",
-    "color": "スパークリング",
-    "country": "フランス",
-    "region": "シャンパーニュ",
-    "varieties": ["シャルドネ"],
-    "sweetness": ["辛口"],
-    "body": ["ミディアム"],
-    "tasteTags": ["ミネラル感", "酸味が爽やか"],
-    "pairingTags": ["前菜・軽い料理", "魚介・カルパッチョ", "デザート・甘味"],
+    "color": "繧ｹ繝代・繧ｯ繝ｪ繝ｳ繧ｰ",
+    "country": "繝輔Λ繝ｳ繧ｹ",
+    "region": "繧ｷ繝｣繝ｳ繝代・繝九Η",
+    "varieties": ["繧ｷ繝｣繝ｫ繝峨ロ"],
+    "sweetness": ["霎帛哨"],
+    "body": ["繝溘ョ繧｣繧｢繝"],
+    "tasteTags": ["繝溘ロ繝ｩ繝ｫ諢・, "驟ｸ蜻ｳ縺檎或繧・°"],
+    "pairingTags": ["蜑崎除繝ｻ霆ｽ縺・侭逅・, "鬲壻ｻ九・繧ｫ繝ｫ繝代ャ繝√Ι", "繝・じ繝ｼ繝医・逕伜袖"],
     "pairingReasons": {
-      "前菜・軽い料理": "きめ細かい泡が食事の始まりに華を添えます"
+      "蜑崎除繝ｻ霆ｽ縺・侭逅・: "縺阪ａ邏ｰ縺九＞豕｡縺碁｣滉ｺ九・蟋九∪繧翫↓闖ｯ繧呈ｷｻ縺医∪縺・
     },
-    "trivia": "特別な日の贈り物としても人気が高く、ギフト需要が多い銘柄です。",
+    "trivia": "迚ｹ蛻･縺ｪ譌･縺ｮ雍医ｊ迚ｩ縺ｨ縺励※繧ゆｺｺ豌励′鬮倥￥縲√ぐ繝輔ヨ髴隕√′螟壹＞驫俶氛縺ｧ縺吶・,
     "nameConfidence": "high",
     "attributeConfidence": "high",
     "attributeSource": null,
@@ -637,20 +633,20 @@ const SEED_PRODUCTS = [
   },
   {
     "code": "SAMPLE-007",
-    "name": "（サンプル）ロゼ・ダンジュ",
-    "producer": "サンプル生産者G",
+    "name": "・医し繝ｳ繝励Ν・峨Ο繧ｼ繝ｻ繝繝ｳ繧ｸ繝･",
+    "producer": "繧ｵ繝ｳ繝励Ν逕溽肇閠・",
     "price": 1900,
     "size": "750ml",
-    "color": "ロゼ",
-    "country": "フランス",
-    "region": "ロワール",
+    "color": "繝ｭ繧ｼ",
+    "country": "繝輔Λ繝ｳ繧ｹ",
+    "region": "繝ｭ繝ｯ繝ｼ繝ｫ",
     "varieties": [],
-    "sweetness": ["やや甘口"],
-    "body": ["軽め"],
-    "tasteTags": ["フルーティ"],
-    "pairingTags": ["前菜・軽い料理", "デザート・甘味"],
+    "sweetness": ["繧・ｄ逕伜哨"],
+    "body": ["霆ｽ繧・],
+    "tasteTags": ["繝輔Ν繝ｼ繝・ぅ"],
+    "pairingTags": ["蜑崎除繝ｻ霆ｽ縺・侭逅・, "繝・じ繝ｼ繝医・逕伜袖"],
     "pairingReasons": {},
-    "trivia": "軽い甘みがあり、ワイン初心者や普段あまり飲まない方への提案にも向いています。",
+    "trivia": "霆ｽ縺・曝縺ｿ縺後≠繧翫√Ρ繧､繝ｳ蛻晏ｿ・・ｄ譎ｮ谿ｵ縺ゅ∪繧企｣ｲ縺ｾ縺ｪ縺・婿縺ｸ縺ｮ謠先｡医↓繧ょ髄縺・※縺・∪縺吶・,
     "nameConfidence": "high",
     "attributeConfidence": "medium",
     "attributeSource": null,
@@ -658,22 +654,22 @@ const SEED_PRODUCTS = [
   },
   {
     "code": "SAMPLE-008",
-    "name": "（サンプル）リオハ・レゼルバ",
-    "producer": "サンプル生産者H",
+    "name": "・医し繝ｳ繝励Ν・峨Μ繧ｪ繝上・繝ｬ繧ｼ繝ｫ繝・,
+    "producer": "繧ｵ繝ｳ繝励Ν逕溽肇閠・",
     "price": 3900,
     "size": "750ml",
-    "color": "赤",
-    "country": "スペイン",
-    "region": "リオハ",
-    "varieties": ["テンプラニーリョ"],
-    "sweetness": ["辛口"],
-    "body": ["重め"],
-    "tasteTags": ["しっかりタンニン", "スパイシー"],
-    "pairingTags": ["牛肉・赤身肉", "チーズ"],
+    "color": "襍､",
+    "country": "繧ｹ繝壹う繝ｳ",
+    "region": "繝ｪ繧ｪ繝・,
+    "varieties": ["繝・Φ繝励Λ繝九・繝ｪ繝ｧ"],
+    "sweetness": ["霎帛哨"],
+    "body": ["驥阪ａ"],
+    "tasteTags": ["縺励▲縺九ｊ繧ｿ繝ｳ繝九Φ", "繧ｹ繝代う繧ｷ繝ｼ"],
+    "pairingTags": ["迚幄ｉ繝ｻ襍､霄ｫ閧・, "繝√・繧ｺ"],
     "pairingReasons": {
-      "牛肉・赤身肉": "樽由来のスパイス香がグリル料理の香ばしさと合います"
+      "迚幄ｉ繝ｻ襍､霄ｫ閧・: "讓ｽ逕ｱ譚･縺ｮ繧ｹ繝代う繧ｹ鬥吶′繧ｰ繝ｪ繝ｫ譁咏炊縺ｮ鬥吶・縺励＆縺ｨ蜷医＞縺ｾ縺・
     },
-    "trivia": "「レゼルバ」は熟成期間の規定をクリアした格付けで、樽と瓶熟成にじっくり時間をかけています。",
+    "trivia": "縲後Ξ繧ｼ繝ｫ繝舌阪・辭滓・譛滄俣縺ｮ隕丞ｮ壹ｒ繧ｯ繝ｪ繧｢縺励◆譬ｼ莉倥￠縺ｧ縲∵ｨｽ縺ｨ逑ｶ辭滓・縺ｫ縺倥▲縺上ｊ譎る俣繧偵°縺代※縺・∪縺吶・,
     "nameConfidence": "high",
     "attributeConfidence": "high",
     "attributeSource": null,
@@ -681,22 +677,22 @@ const SEED_PRODUCTS = [
   },
   {
     "code": "SAMPLE-009",
-    "name": "（サンプル）ドイツ リースリング 中口",
-    "producer": "サンプル生産者I",
+    "name": "・医し繝ｳ繝励Ν・峨ラ繧､繝・繝ｪ繝ｼ繧ｹ繝ｪ繝ｳ繧ｰ 荳ｭ蜿｣",
+    "producer": "繧ｵ繝ｳ繝励Ν逕溽肇閠・",
     "price": 2600,
     "size": "750ml",
-    "color": "白",
-    "country": "ドイツ",
+    "color": "逋ｽ",
+    "country": "繝峨う繝・,
     "region": null,
-    "varieties": ["リースリング"],
-    "sweetness": ["中口"],
-    "body": ["軽め"],
-    "tasteTags": ["フルーティ", "酸味が爽やか"],
-    "pairingTags": ["豚肉・鶏肉", "和食全般", "デザート・甘味"],
+    "varieties": ["繝ｪ繝ｼ繧ｹ繝ｪ繝ｳ繧ｰ"],
+    "sweetness": ["荳ｭ蜿｣"],
+    "body": ["霆ｽ繧・],
+    "tasteTags": ["繝輔Ν繝ｼ繝・ぅ", "驟ｸ蜻ｳ縺檎或繧・°"],
+    "pairingTags": ["雎夊ｉ繝ｻ鮓剰ｉ", "蜥碁｣溷・闊ｬ", "繝・じ繝ｼ繝医・逕伜袖"],
     "pairingReasons": {
-      "豚肉・鶏肉": "ほのかな甘みが辛味のある味付けとよく合います"
+      "雎夊ｉ繝ｻ鮓剰ｉ": "縺ｻ縺ｮ縺九↑逕倥∩縺瑚ｾ帛袖縺ｮ縺ゅｋ蜻ｳ莉倥￠縺ｨ繧医￥蜷医＞縺ｾ縺・
     },
-    "trivia": "リースリングは酸と甘みのバランスが多彩で、ラベルの表記（Trocken=辛口など）で見分けられます。",
+    "trivia": "繝ｪ繝ｼ繧ｹ繝ｪ繝ｳ繧ｰ縺ｯ驟ｸ縺ｨ逕倥∩縺ｮ繝舌Λ繝ｳ繧ｹ縺悟､壼ｽｩ縺ｧ縲√Λ繝吶Ν縺ｮ陦ｨ險假ｼ・rocken=霎帛哨縺ｪ縺ｩ・峨〒隕句・縺代ｉ繧後∪縺吶・,
     "nameConfidence": "high",
     "attributeConfidence": "medium",
     "attributeSource": null,
@@ -704,22 +700,22 @@ const SEED_PRODUCTS = [
   },
   {
     "code": "SAMPLE-010",
-    "name": "（サンプル）チリ カベルネ・ソーヴィニヨン デイリー",
-    "producer": "サンプル生産者J",
+    "name": "・医し繝ｳ繝励Ν・峨メ繝ｪ 繧ｫ繝吶Ν繝阪・繧ｽ繝ｼ繝ｴ繧｣繝九Κ繝ｳ 繝・う繝ｪ繝ｼ",
+    "producer": "繧ｵ繝ｳ繝励Ν逕溽肇閠・",
     "price": 1500,
     "size": "750ml",
-    "color": "赤",
-    "country": "チリ",
+    "color": "襍､",
+    "country": "繝√Μ",
     "region": null,
-    "varieties": ["カベルネ・ソーヴィニヨン"],
-    "sweetness": ["辛口"],
-    "body": ["ミディアム"],
-    "tasteTags": ["フルーティ", "しっかりタンニン"],
-    "pairingTags": ["牛肉・赤身肉", "パスタ・トマト系"],
+    "varieties": ["繧ｫ繝吶Ν繝阪・繧ｽ繝ｼ繝ｴ繧｣繝九Κ繝ｳ"],
+    "sweetness": ["霎帛哨"],
+    "body": ["繝溘ョ繧｣繧｢繝"],
+    "tasteTags": ["繝輔Ν繝ｼ繝・ぅ", "縺励▲縺九ｊ繧ｿ繝ｳ繝九Φ"],
+    "pairingTags": ["迚幄ｉ繝ｻ襍､霄ｫ閧・, "繝代せ繧ｿ繝ｻ繝医・繝育ｳｻ"],
     "pairingReasons": {
-      "牛肉・赤身肉": "コストパフォーマンスが高く、普段使いの赤身肉料理に合わせやすい一本です"
+      "迚幄ｉ繝ｻ襍､霄ｫ閧・: "繧ｳ繧ｹ繝医ヱ繝輔か繝ｼ繝槭Φ繧ｹ縺碁ｫ倥￥縲∵勸谿ｵ菴ｿ縺・・襍､霄ｫ閧画侭逅・↓蜷医ｏ縺帙ｄ縺吶＞荳譛ｬ縺ｧ縺・
     },
-    "trivia": "チリは寒暖差の大きい産地が多く、凝縮感のあるカベルネ・ソーヴィニヨンが手頃な価格で手に入ります。",
+    "trivia": "繝√Μ縺ｯ蟇呈囑蟾ｮ縺ｮ螟ｧ縺阪＞逕｣蝨ｰ縺悟､壹￥縲∝・邵ｮ諢溘・縺ゅｋ繧ｫ繝吶Ν繝阪・繧ｽ繝ｼ繝ｴ繧｣繝九Κ繝ｳ縺梧焔鬆・↑萓｡譬ｼ縺ｧ謇九↓蜈･繧翫∪縺吶・,
     "nameConfidence": "high",
     "attributeConfidence": "high",
     "attributeSource": null,
@@ -727,20 +723,20 @@ const SEED_PRODUCTS = [
   },
   {
     "code": "SAMPLE-011",
-    "name": "（サンプル）ナパヴァレー シャルドネ",
-    "producer": "サンプル生産者K",
+    "name": "・医し繝ｳ繝励Ν・峨リ繝代Χ繧｡繝ｬ繝ｼ 繧ｷ繝｣繝ｫ繝峨ロ",
+    "producer": "繧ｵ繝ｳ繝励Ν逕溽肇閠・",
     "price": 6500,
     "size": "750ml",
-    "color": "白",
-    "country": "アメリカ",
+    "color": "逋ｽ",
+    "country": "繧｢繝｡繝ｪ繧ｫ",
     "region": null,
-    "varieties": ["シャルドネ"],
-    "sweetness": ["辛口"],
-    "body": ["重め"],
-    "tasteTags": ["フルーティ", "なめらか（タンニン控えめ）"],
-    "pairingTags": ["チーズ", "パスタ・トマト系"],
+    "varieties": ["繧ｷ繝｣繝ｫ繝峨ロ"],
+    "sweetness": ["霎帛哨"],
+    "body": ["驥阪ａ"],
+    "tasteTags": ["繝輔Ν繝ｼ繝・ぅ", "縺ｪ繧√ｉ縺具ｼ医ち繝ｳ繝九Φ謗ｧ縺医ａ・・],
+    "pairingTags": ["繝√・繧ｺ", "繝代せ繧ｿ繝ｻ繝医・繝育ｳｻ"],
     "pairingReasons": {},
-    "trivia": "樽熟成によるバニラやバターのような香りが特徴で、しっかりした料理にも負けない厚みがあります。",
+    "trivia": "讓ｽ辭滓・縺ｫ繧医ｋ繝舌ル繝ｩ繧・ヰ繧ｿ繝ｼ縺ｮ繧医≧縺ｪ鬥吶ｊ縺檎音蠕ｴ縺ｧ縲√＠縺｣縺九ｊ縺励◆譁咏炊縺ｫ繧りｲ縺代↑縺・字縺ｿ縺後≠繧翫∪縺吶・,
     "nameConfidence": "high",
     "attributeConfidence": "medium",
     "attributeSource": null,
@@ -748,20 +744,20 @@ const SEED_PRODUCTS = [
   },
   {
     "code": "SAMPLE-012",
-    "name": "（サンプル）取扱終了デモ用ワイン",
-    "producer": "サンプル生産者L",
+    "name": "・医し繝ｳ繝励Ν・牙叙謇ｱ邨ゆｺ・ョ繝｢逕ｨ繝ｯ繧､繝ｳ",
+    "producer": "繧ｵ繝ｳ繝励Ν逕溽肇閠・",
     "price": 3000,
     "size": "750ml",
-    "color": "赤",
-    "country": "その他",
+    "color": "襍､",
+    "country": "縺昴・莉・,
     "region": null,
     "varieties": [],
-    "sweetness": ["辛口"],
-    "body": ["ミディアム"],
+    "sweetness": ["霎帛哨"],
+    "body": ["繝溘ョ繧｣繧｢繝"],
     "tasteTags": [],
     "pairingTags": [],
     "pairingReasons": {},
-    "trivia": "管理タブでの「取扱終了」表示・一覧からの除外を確認するためのサンプルです。",
+    "trivia": "邂｡逅・ち繝悶〒縺ｮ縲悟叙謇ｱ邨ゆｺ・崎｡ｨ遉ｺ繝ｻ荳隕ｧ縺九ｉ縺ｮ髯､螟悶ｒ遒ｺ隱阪☆繧九◆繧√・繧ｵ繝ｳ繝励Ν縺ｧ縺吶・,
     "nameConfidence": "high",
     "attributeConfidence": "high",
     "attributeSource": null,
@@ -770,12 +766,8 @@ const SEED_PRODUCTS = [
 ]
 ;
 
-// ここにGoogle Apps ScriptのWebアプリURLを設定すると、スタッフパスコードでの同期・
-// 管理タブでの追加/価格改定/取扱終了が有効になる。
-// 未設定の間は開発確認用として、パスコード入力後にSEED_PRODUCTS（非機密のプレースホルダー）
-// を表示する（実データではないので公開ホスティングしても問題ない）。
-// 設定後は build.js を再実行して index.html を作り直すこと。
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyayRiyGuhpOexpqRmFZiuM6WqSmr_tpGGNhw3ocW-YVEhxTqChiARbXGbreMESreFa/exec';
+// 縺薙％縺ｫGoogle Apps Script縺ｮWeb繧｢繝励ΜURL繧定ｨｭ螳壹☆繧九→縲√せ繧ｿ繝・ヵ繝代せ繧ｳ繝ｼ繝峨〒縺ｮ蜷梧悄繝ｻ
+// 邂｡逅・ち繝悶〒縺ｮ霑ｽ蜉/萓｡譬ｼ謾ｹ螳・蜿匁桶邨ゆｺ・′譛牙柑縺ｫ縺ｪ繧九・// 譛ｪ險ｭ螳壹・髢薙・髢狗匱遒ｺ隱咲畑縺ｨ縺励※縲√ヱ繧ｹ繧ｳ繝ｼ繝牙・蜉帛ｾ後↓SEED_PRODUCTS・磯撼讖溷ｯ・・繝励Ξ繝ｼ繧ｹ繝帙Ν繝繝ｼ・・// 繧定｡ｨ遉ｺ縺吶ｋ・亥ｮ溘ョ繝ｼ繧ｿ縺ｧ縺ｯ縺ｪ縺・・縺ｧ蜈ｬ髢九・繧ｹ繝・ぅ繝ｳ繧ｰ縺励※繧ょ撫鬘後↑縺・ｼ峨・// 險ｭ螳壼ｾ後・ build.js 繧貞・螳溯｡後＠縺ｦ index.html 繧剃ｽ懊ｊ逶ｴ縺吶％縺ｨ縲・const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyayRiyGuhpOexpqRmFZiuM6WqSmr_tpGGNhw3ocW-YVEhxTqChiARbXGbreMESreFa/exec';
 
 const STORAGE_KEY = 'wineToolCache_v1';
 const STAFF_PASSCODE_KEY = 'wineToolStaffPasscode_v1';
@@ -797,8 +789,7 @@ function saveCache(products) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ products, syncedAt: Date.now() }));
   } catch (e) {
-    // 保存できなくても動作は継続する
-  }
+    // 菫晏ｭ倥〒縺阪↑縺上※繧ょ虚菴懊・邯咏ｶ壹☆繧・  }
 }
 
 function getLastSyncedAt() {
@@ -812,17 +803,16 @@ function getLastSyncedAt() {
 }
 
 function formatSyncedAt(ts) {
-  if (!ts) return '未同期';
+  if (!ts) return '譛ｪ蜷梧悄';
   const d = new Date(ts);
-  return '最終同期: ' + d.toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  return '譛邨ょ酔譛・ ' + d.toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
 function updateSyncStatus() {
   document.getElementById('syncStatus').textContent = formatSyncedAt(getLastSyncedAt());
 }
 
-// スタッフパスコードを添えてApps Scriptから最新データを取得する。
-// 戻り値: { ok, reason } reasonは 'network'（通信不可）/ 'invalid'（パスコード誤り）/ 'not_configured'
+// 繧ｹ繧ｿ繝・ヵ繝代せ繧ｳ繝ｼ繝峨ｒ豺ｻ縺医※Apps Script縺九ｉ譛譁ｰ繝・・繧ｿ繧貞叙蠕励☆繧九・// 謌ｻ繧雁､: { ok, reason } reason縺ｯ 'network'・磯壻ｿ｡荳榊庄・・ 'invalid'・医ヱ繧ｹ繧ｳ繝ｼ繝芽ｪ､繧奇ｼ・ 'not_configured'
 async function syncFromServer(passcode, silent) {
   if (!APPS_SCRIPT_URL) {
     return { ok: false, reason: 'not_configured' };
@@ -842,7 +832,7 @@ async function syncFromServer(passcode, silent) {
     populateAdminSelects();
     return { ok: true };
   } catch (e) {
-    if (!silent) alert('同期に失敗しました。通信環境をご確認ください。');
+    if (!silent) alert('蜷梧悄縺ｫ螟ｱ謨励＠縺ｾ縺励◆縲る壻ｿ｡迺ｰ蠅・ｒ縺皮｢ｺ隱阪￥縺縺輔＞縲・);
     return { ok: false, reason: 'network' };
   }
 }
@@ -852,7 +842,7 @@ document.getElementById('syncButton').addEventListener('click', async () => {
   await syncFromServer(passcode, false);
 });
 
-// ---------- 起動時認証ゲート ----------
+// ---------- 襍ｷ蜍墓凾隱崎ｨｼ繧ｲ繝ｼ繝・----------
 
 function showAuthError(text) {
   document.getElementById('authMsg').innerHTML = `<div class="msg err">${text}</div>`;
@@ -866,8 +856,7 @@ function enterApp() {
 
 async function tryStaffLogin(passcode, silent) {
   if (!APPS_SCRIPT_URL) {
-    // Apps Script未設定時の開発確認用フォールバック（非機密のプレースホルダーデータのみ使用）
-    PRODUCTS = loadCache() || SEED_PRODUCTS;
+    // Apps Script譛ｪ險ｭ螳壽凾縺ｮ髢狗匱遒ｺ隱咲畑繝輔か繝ｼ繝ｫ繝舌ャ繧ｯ・磯撼讖溷ｯ・・繝励Ξ繝ｼ繧ｹ繝帙Ν繝繝ｼ繝・・繧ｿ縺ｮ縺ｿ菴ｿ逕ｨ・・    PRODUCTS = loadCache() || SEED_PRODUCTS;
     localStorage.setItem(STAFF_PASSCODE_KEY, passcode);
     return true;
   }
@@ -877,23 +866,23 @@ async function tryStaffLogin(passcode, silent) {
     return true;
   }
   if (result.reason === 'network') {
-    // オフライン時は、直近まで認証済みだった端末ならキャッシュで継続動作させる
+    // 繧ｪ繝輔Λ繧､繝ｳ譎ゅ・縲∫峩霑代∪縺ｧ隱崎ｨｼ貂医∩縺縺｣縺溽ｫｯ譛ｫ縺ｪ繧峨く繝｣繝・す繝･縺ｧ邯咏ｶ壼虚菴懊＆縺帙ｋ
     const cached = loadCache();
     if (cached && localStorage.getItem(STAFF_PASSCODE_KEY)) {
       PRODUCTS = cached;
       return true;
     }
-    if (!silent) showAuthError('通信環境をご確認ください（初回はオンラインでの認証が必要です）。');
+    if (!silent) showAuthError('騾壻ｿ｡迺ｰ蠅・ｒ縺皮｢ｺ隱阪￥縺縺輔＞・亥・蝗槭・繧ｪ繝ｳ繝ｩ繧､繝ｳ縺ｧ縺ｮ隱崎ｨｼ縺悟ｿ・ｦ√〒縺呻ｼ峨・);
     return false;
   }
-  if (!silent) showAuthError('パスコードが正しくありません。');
+  if (!silent) showAuthError('繝代せ繧ｳ繝ｼ繝峨′豁｣縺励￥縺ゅｊ縺ｾ縺帙ｓ縲・);
   localStorage.removeItem(STAFF_PASSCODE_KEY);
   return false;
 }
 
 document.getElementById('authButton').addEventListener('click', async () => {
   const passcode = document.getElementById('authPasscode').value;
-  if (!passcode) { showAuthError('パスコードを入力してください'); return; }
+  if (!passcode) { showAuthError('繝代せ繧ｳ繝ｼ繝峨ｒ蜈･蜉帙＠縺ｦ縺上□縺輔＞'); return; }
   const ok = await tryStaffLogin(passcode, false);
   if (ok) enterApp();
 });
@@ -904,10 +893,10 @@ async function initAuth() {
     const ok = await tryStaffLogin(storedPasscode, true);
     if (ok) { enterApp(); return; }
   }
-  // ゲート画面のまま入力待ち
+  // 繧ｲ繝ｼ繝育判髱｢縺ｮ縺ｾ縺ｾ蜈･蜉帛ｾ・■
 }
 
-// ---------- レコメンドタブ ----------
+// ---------- 繝ｬ繧ｳ繝｡繝ｳ繝峨ち繝・----------
 
 function renderCheckboxGroup(containerId, name, values) {
   const container = document.getElementById(containerId);
@@ -959,11 +948,26 @@ function priceLabelsToBandIds(labels) {
 }
 
 function wineColorClass(color) {
-  if (color === '赤') return 'wine-red';
-  if (color === '白') return 'wine-white';
-  if (color === 'ロゼ') return 'wine-rose';
-  if (color === 'スパークリング') return 'wine-sparkling';
+  if (color === '襍､') return 'wine-red';
+  if (color === '逋ｽ') return 'wine-white';
+  if (color === '繝ｭ繧ｼ') return 'wine-rose';
   return '';
+}
+
+function colorMetaText(product) {
+  const parts = [product.color, product.sparkling ? '繧ｹ繝代・繧ｯ繝ｪ繝ｳ繧ｰ' : null].filter(Boolean);
+  return parts.join('繝ｻ');
+}
+
+function cardClasses(product) {
+  return [wineColorClass(product.color), product.sparkling ? 'wine-sparkling' : ''].filter(Boolean).join(' ');
+}
+
+function swatchesHtml(product) {
+  const colorSwatch = wineColorClass(product.color)
+    ? `<span class="swatch ${wineColorClass(product.color)}"></span>` : '';
+  const sparklingSwatch = product.sparkling ? '<span class="swatch wine-sparkling"></span>' : '';
+  return colorSwatch + sparklingSwatch;
 }
 
 function buildReasonText(product, matchedPairingTags) {
@@ -972,7 +976,7 @@ function buildReasonText(product, matchedPairingTags) {
     .map((tag) => (product.pairingReasons || {})[tag])
     .filter(Boolean);
   if (reasons.length === 0) {
-    return `<div class="reason">選択された料理（${matchedPairingTags.join('、')}）との相性が良いタイプです</div>`;
+    return `<div class="reason">驕ｸ謚槭＆繧後◆譁咏炊・・{matchedPairingTags.join('縲・)}・峨→縺ｮ逶ｸ諤ｧ縺瑚憶縺・ち繧､繝励〒縺・/div>`;
   }
   return `<div class="reason">${reasons.join('<br>')}</div>`;
 }
@@ -983,22 +987,22 @@ function renderResultCard(entry) {
   const lowConfidence = p.nameConfidence === 'medium' || p.nameConfidence === 'low'
     || p.attributeConfidence === 'medium' || p.attributeConfidence === 'low' || p.attributeConfidence === 'not_found';
   const caution = lowConfidence
-    ? `<div class="caution">⚠ 情報の確証度が低めです。商品コード <span class="code">${p.code}</span> で現物のラベルをご確認ください</div>`
+    ? `<div class="caution">笞 諠・ｱ縺ｮ遒ｺ險ｼ蠎ｦ縺御ｽ弱ａ縺ｧ縺吶ょ膚蜩√さ繝ｼ繝・<span class="code">${p.code}</span> 縺ｧ迴ｾ迚ｩ縺ｮ繝ｩ繝吶Ν繧偵＃遒ｺ隱阪￥縺縺輔＞</div>`
     : '';
   const tasteLine = [...(p.sweetness || []), ...(p.body || [])].join(' / ');
   const trivia = p.trivia ? `<div class="trivia">${p.trivia}</div>` : '';
   const reason = buildReasonText(p, entry.breakdown && entry.breakdown.pairingTags);
   return `
-    <div class="card ${wineColorClass(p.color)}">
-      <h3><span class="swatch ${wineColorClass(p.color)}"></span>${p.name}<span class="score">一致度 ${percent}%</span></h3>
-      <div class="meta">${p.price === null || p.price === undefined ? '価格不明' : p.price.toLocaleString() + '円'}${p.size ? '（' + p.size + '）' : ''} ／ ${p.color || ''} ／ ${p.country || '産地不明'}${p.region ? '（' + p.region + '）' : ''}</div>
+    <div class="card ${cardClasses(p)}">
+      <h3>${swatchesHtml(p)}${p.name}<span class="score">荳閾ｴ蠎ｦ ${percent}%</span></h3>
+      <div class="meta">${p.price === null || p.price === undefined ? '萓｡譬ｼ荳肴・' : p.price.toLocaleString() + '蜀・}${p.size ? '・・ + p.size + '・・ : ''} ・・${colorMetaText(p) || ''} ・・${p.country || '逕｣蝨ｰ荳肴・'}${p.region ? '・・ + p.region + '・・ : ''}</div>
       <div class="meta">${tasteLine}</div>
       <div>${(p.tasteTags || []).map((t) => `<span class="tag">${t}</span>`).join('')}</div>
       <div>${(p.pairingTags || []).map((t) => `<span class="tag">${t}</span>`).join('')}</div>
       ${reason}
       ${trivia}
       ${caution}
-      <div class="code" style="margin-top:6px;">コード: ${p.code}</div>
+      <div class="code" style="margin-top:6px;">繧ｳ繝ｼ繝・ ${p.code}</div>
     </div>
   `;
 }
@@ -1019,6 +1023,7 @@ document.getElementById('searchButton').addEventListener('click', () => {
     priceMin: parsePriceInput('priceMinInput'),
     priceMax: parsePriceInput('priceMaxInput'),
     colors: getCheckedValues('color'),
+    sparklingOnly: document.getElementById('sparklingOnly').checked,
     countries: getCheckedValues('country'),
     regions: getCheckedValues('region'),
     varieties: getCheckedValues('variety'),
@@ -1030,7 +1035,7 @@ document.getElementById('searchButton').addEventListener('click', () => {
   const ranked = rankProducts(PRODUCTS, criteria, 20);
   document.getElementById('results').innerHTML = ranked.length > 0
     ? ranked.map(renderResultCard).join('')
-    : '<p class="muted">条件に合う商品が見つかりませんでした。条件を減らしてお試しください。</p>';
+    : '<p class="muted">譚｡莉ｶ縺ｫ蜷医≧蝠・刀縺瑚ｦ九▽縺九ｊ縺ｾ縺帙ｓ縺ｧ縺励◆縲よ擅莉ｶ繧呈ｸ帙ｉ縺励※縺願ｩｦ縺励￥縺縺輔＞縲・/p>';
 });
 
 document.getElementById('clearCriteriaButton').addEventListener('click', () => {
@@ -1043,15 +1048,15 @@ document.getElementById('clearCriteriaButton').addEventListener('click', () => {
   document.getElementById('results').innerHTML = '';
 });
 
-// ---------- 一覧タブ ----------
+// ---------- 荳隕ｧ繧ｿ繝・----------
 
 function renderListCard(p) {
   return `
-    <div class="card ${wineColorClass(p.color)}" data-code="${p.code}">
-      <h3><span class="swatch ${wineColorClass(p.color)}"></span>${p.name}</h3>
-      <div class="meta">${p.price === null || p.price === undefined ? '価格不明' : p.price.toLocaleString() + '円'}${p.size ? '（' + p.size + '）' : ''} ／ ${p.color || ''} ／ ${p.country || '産地不明'}${p.region ? '（' + p.region + '）' : ''}</div>
+    <div class="card ${cardClasses(p)}" data-code="${p.code}">
+      <h3>${swatchesHtml(p)}${p.name}</h3>
+      <div class="meta">${p.price === null || p.price === undefined ? '萓｡譬ｼ荳肴・' : p.price.toLocaleString() + '蜀・}${p.size ? '・・ + p.size + '・・ : ''} ・・${colorMetaText(p) || ''} ・・${p.country || '逕｣蝨ｰ荳肴・'}${p.region ? '・・ + p.region + '・・ : ''}</div>
       <div>${(p.varieties || []).map((v) => `<span class="tag">${v}</span>`).join('')}</div>
-      <div class="code" style="margin-top:6px;">コード: ${p.code}</div>
+      <div class="code" style="margin-top:6px;">繧ｳ繝ｼ繝・ ${p.code}</div>
     </div>
   `;
 }
@@ -1071,30 +1076,30 @@ function renderListResults() {
 
 document.getElementById('listSearch').addEventListener('input', renderListResults);
 
-// ---------- 詳細オーバーレイ ----------
+// ---------- 隧ｳ邏ｰ繧ｪ繝ｼ繝舌・繝ｬ繧､ ----------
 
 function openDetail(code) {
   const p = PRODUCTS.find((x) => x.code === code);
   if (!p) return;
   const tasteLine = [...(p.sweetness || []), ...(p.body || [])].join(' / ');
   const pairingReasonLines = Object.entries(p.pairingReasons || {})
-    .map(([tag, reason]) => `<div class="reason"><b>${tag}</b>：${reason}</div>`).join('');
+    .map(([tag, reason]) => `<div class="reason"><b>${tag}</b>・・{reason}</div>`).join('');
   const lowConfidence = p.nameConfidence === 'medium' || p.nameConfidence === 'low'
     || p.attributeConfidence === 'medium' || p.attributeConfidence === 'low' || p.attributeConfidence === 'not_found';
   document.getElementById('detailContent').innerHTML = `
-    <h2><span class="swatch ${wineColorClass(p.color)}"></span>${p.name}</h2>
+    <h2>${swatchesHtml(p)}${p.name}</h2>
     <div class="muted">${p.producer || ''}</div>
-    <div class="meta">${p.price === null || p.price === undefined ? '価格不明' : p.price.toLocaleString() + '円'}${p.size ? '（' + p.size + '）' : ''} ／ ${p.color || ''} ／ ${p.country || '産地不明'}${p.region ? '（' + p.region + '）' : ''}</div>
+    <div class="meta">${p.price === null || p.price === undefined ? '萓｡譬ｼ荳肴・' : p.price.toLocaleString() + '蜀・}${p.size ? '・・ + p.size + '・・ : ''} ・・${colorMetaText(p) || ''} ・・${p.country || '逕｣蝨ｰ荳肴・'}${p.region ? '・・ + p.region + '・・ : ''}</div>
     <div>${(p.varieties || []).map((v) => `<span class="tag">${v}</span>`).join('')}</div>
     <p class="meta">${tasteLine}</p>
     <div>${(p.tasteTags || []).map((t) => `<span class="tag">${t}</span>`).join('')}</div>
-    <h3>ペアリング</h3>
+    <h3>繝壹い繝ｪ繝ｳ繧ｰ</h3>
     <div>${(p.pairingTags || []).map((t) => `<span class="tag">${t}</span>`).join('')}</div>
     ${pairingReasonLines}
-    ${p.trivia ? `<h3>接客トーク素材</h3><div class="trivia">${p.trivia}</div>` : ''}
-    ${p.status === 'discontinued' ? '<div class="caution">現在は取扱終了商品です</div>' : ''}
-    ${lowConfidence ? '<div class="caution">⚠ 情報の確証度が低めです。下記コードで現物のラベルをご確認ください</div>' : ''}
-    <div class="code" style="margin-top:8px;">商品コード: ${p.code}</div>
+    ${p.trivia ? `<h3>謗･螳｢繝医・繧ｯ邏譚・/h3><div class="trivia">${p.trivia}</div>` : ''}
+    ${p.status === 'discontinued' ? '<div class="caution">迴ｾ蝨ｨ縺ｯ蜿匁桶邨ゆｺ・膚蜩√〒縺・/div>' : ''}
+    ${lowConfidence ? '<div class="caution">笞 諠・ｱ縺ｮ遒ｺ險ｼ蠎ｦ縺御ｽ弱ａ縺ｧ縺吶ゆｸ玖ｨ倥さ繝ｼ繝峨〒迴ｾ迚ｩ縺ｮ繝ｩ繝吶Ν繧偵＃遒ｺ隱阪￥縺縺輔＞</div>' : ''}
+    <div class="code" style="margin-top:8px;">蝠・刀繧ｳ繝ｼ繝・ ${p.code}</div>
   `;
   document.getElementById('detailOverlay').classList.remove('hidden');
 }
@@ -1103,14 +1108,14 @@ document.getElementById('detailCloseButton').addEventListener('click', () => {
   document.getElementById('detailOverlay').classList.add('hidden');
 });
 
-// ---------- 管理タブ ----------
+// ---------- 邂｡逅・ち繝・----------
 
 let adminPasscodeValue = '';
 
 document.getElementById('adminUnlockButton').addEventListener('click', () => {
   const value = document.getElementById('adminPasscode').value;
   if (!value) {
-    alert('パスコードを入力してください');
+    alert('繝代せ繧ｳ繝ｼ繝峨ｒ蜈･蜉帙＠縺ｦ縺上□縺輔＞');
     return;
   }
   adminPasscodeValue = value;
@@ -1140,7 +1145,7 @@ function showAdminMsg(text, ok) {
 
 async function callAppsScript(payload) {
   if (!APPS_SCRIPT_URL) {
-    showAdminMsg('Apps ScriptのURLが未設定です。READMEを参照して設定してください。', false);
+    showAdminMsg('Apps Script縺ｮURL縺梧悴險ｭ螳壹〒縺吶３EADME繧貞盾辣ｧ縺励※險ｭ螳壹＠縺ｦ縺上□縺輔＞縲・, false);
     return false;
   }
   try {
@@ -1150,18 +1155,18 @@ async function callAppsScript(payload) {
     });
     const data = await res.json();
     if (data.error === 'passcode_invalid') {
-      showAdminMsg('パスコードが正しくありません。', false);
+      showAdminMsg('繝代せ繧ｳ繝ｼ繝峨′豁｣縺励￥縺ゅｊ縺ｾ縺帙ｓ縲・, false);
       return false;
     }
     if (data.error) {
-      showAdminMsg('エラーが発生しました: ' + data.error, false);
+      showAdminMsg('繧ｨ繝ｩ繝ｼ縺檎匱逕溘＠縺ｾ縺励◆: ' + data.error, false);
       return false;
     }
     const staffPasscode = localStorage.getItem(STAFF_PASSCODE_KEY) || '';
     await syncFromServer(staffPasscode, true);
     return true;
   } catch (e) {
-    showAdminMsg('通信エラーが発生しました。通信環境をご確認ください。', false);
+    showAdminMsg('騾壻ｿ｡繧ｨ繝ｩ繝ｼ縺檎匱逕溘＠縺ｾ縺励◆縲る壻ｿ｡迺ｰ蠅・ｒ縺皮｢ｺ隱阪￥縺縺輔＞縲・, false);
     return false;
   }
 }
@@ -1172,7 +1177,7 @@ function splitCsv(text) {
 
 document.getElementById('admAddButton').addEventListener('click', async () => {
   const name = document.getElementById('admName').value.trim();
-  if (!name) { showAdminMsg('商品名を入力してください', false); return; }
+  if (!name) { showAdminMsg('蝠・刀蜷阪ｒ蜈･蜉帙＠縺ｦ縺上□縺輔＞', false); return; }
   const product = {
     code: 'W-' + Date.now(),
     name,
@@ -1180,6 +1185,7 @@ document.getElementById('admAddButton').addEventListener('click', async () => {
     price: Number(document.getElementById('admPrice').value) || null,
     size: document.getElementById('admSize').value.trim() || null,
     color: document.getElementById('admColor').value || null,
+    sparkling: document.getElementById('admSparkling').checked,
     country: document.getElementById('admCountry').value.trim() || null,
     region: document.getElementById('admRegion').value.trim() || null,
     varieties: splitCsv(document.getElementById('admVarieties').value),
@@ -1195,34 +1201,34 @@ document.getElementById('admAddButton').addEventListener('click', async () => {
     status: 'active',
   };
   const success = await callAppsScript({ action: 'add', product });
-  if (success) showAdminMsg('「' + name + '」を追加しました', true);
+  if (success) showAdminMsg('縲・ + name + '縲阪ｒ霑ｽ蜉縺励∪縺励◆', true);
 });
 
 document.getElementById('admPriceButton').addEventListener('click', async () => {
   const code = document.getElementById('admPriceTarget').value;
   const newPrice = Number(document.getElementById('admNewPrice').value);
-  if (!code || !newPrice) { showAdminMsg('対象商品と新価格を指定してください', false); return; }
+  if (!code || !newPrice) { showAdminMsg('蟇ｾ雎｡蝠・刀縺ｨ譁ｰ萓｡譬ｼ繧呈欠螳壹＠縺ｦ縺上□縺輔＞', false); return; }
   const success = await callAppsScript({ action: 'update', code, patch: { price: newPrice } });
-  if (success) showAdminMsg('価格を更新しました', true);
+  if (success) showAdminMsg('萓｡譬ｼ繧呈峩譁ｰ縺励∪縺励◆', true);
 });
 
 document.getElementById('admDiscontinueButton').addEventListener('click', async () => {
   const code = document.getElementById('admDiscontinueTarget').value;
-  if (!code) { showAdminMsg('対象商品を選択してください', false); return; }
+  if (!code) { showAdminMsg('蟇ｾ雎｡蝠・刀繧帝∈謚槭＠縺ｦ縺上□縺輔＞', false); return; }
   const success = await callAppsScript({ action: 'setStatus', code, status: 'discontinued' });
-  if (success) showAdminMsg('取扱終了にしました', true);
+  if (success) showAdminMsg('蜿匁桶邨ゆｺ・↓縺励∪縺励◆', true);
 });
 
 document.getElementById('admReactivateButton').addEventListener('click', async () => {
   const code = document.getElementById('admReactivateTarget').value;
-  if (!code) { showAdminMsg('対象商品を選択してください', false); return; }
+  if (!code) { showAdminMsg('蟇ｾ雎｡蝠・刀繧帝∈謚槭＠縺ｦ縺上□縺輔＞', false); return; }
   const success = await callAppsScript({ action: 'setStatus', code, status: 'active' });
-  if (success) showAdminMsg('取扱を再開しました', true);
+  if (success) showAdminMsg('蜿匁桶繧貞・髢九＠縺ｾ縺励◆', true);
 });
 
 document.getElementById('admDeleteButton').addEventListener('click', () => {
   const code = document.getElementById('admDeleteTarget').value;
-  if (!code) { showAdminMsg('対象商品を選択してください', false); return; }
+  if (!code) { showAdminMsg('蟇ｾ雎｡蝠・刀繧帝∈謚槭＠縺ｦ縺上□縺輔＞', false); return; }
   const product = PRODUCTS.find((p) => p.code === code);
   document.getElementById('admDeleteConfirmName').textContent = product ? product.name : code;
   document.getElementById('admDeleteConfirm').classList.remove('hidden');
@@ -1234,13 +1240,13 @@ document.getElementById('admDeleteCancelButton').addEventListener('click', () =>
 
 document.getElementById('admDeleteConfirmButton').addEventListener('click', async () => {
   const code = document.getElementById('admDeleteTarget').value;
-  if (!code) { showAdminMsg('対象商品を選択してください', false); return; }
+  if (!code) { showAdminMsg('蟇ｾ雎｡蝠・刀繧帝∈謚槭＠縺ｦ縺上□縺輔＞', false); return; }
   document.getElementById('admDeleteConfirm').classList.add('hidden');
   const success = await callAppsScript({ action: 'delete', code });
-  if (success) showAdminMsg('完全に削除しました', true);
+  if (success) showAdminMsg('螳悟・縺ｫ蜑企勁縺励∪縺励◆', true);
 });
 
-// ---------- タブ切り替え ----------
+// ---------- 繧ｿ繝門・繧頑崛縺・----------
 
 document.querySelectorAll('.tabBtn').forEach((btn) => {
   btn.addEventListener('click', () => {
@@ -1251,7 +1257,7 @@ document.querySelectorAll('.tabBtn').forEach((btn) => {
   });
 });
 
-// ---------- アプリ本体の初期化（認証成功後に実行） ----------
+// ---------- 繧｢繝励Μ譛ｬ菴薙・蛻晄悄蛹厄ｼ郁ｪ崎ｨｼ謌仙粥蠕後↓螳溯｡鯉ｼ・----------
 
 function startApp() {
   initForm();
