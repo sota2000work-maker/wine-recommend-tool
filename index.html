@@ -74,6 +74,7 @@
     padding: 2px 9px; border-radius: 999px; white-space: nowrap; margin-left: auto;
   }
   .meta { color: var(--ink-soft); font-size: 13px; }
+  .thumb { float: right; width: 72px; height: 96px; object-fit: contain; margin: 0 0 6px 10px; background: #fff; border-radius: 8px; }
   .tag {
     display: inline-block; background: var(--cream); border: 1px solid var(--border); color: var(--ink);
     border-radius: 999px; padding: 3px 10px; margin: 2px 4px 2px 0; font-size: 12px;
@@ -1001,6 +1002,13 @@ function buildReasonText(product, matchedPairingTags) {
   return `<div class="reason">${reasons.join('<br>')}</div>`;
 }
 
+// 画像はアプリと同じ場所の img/ に置いたファイルを使う（外部サイトには接続しない）。
+// スプレッドシートの imageUrl 列には "img/xxxxxxxxxxxxxxxx.webp" の形式で入れる。読み込み失敗時は画像を消す。
+function thumbHtml(p) {
+  if (typeof p.imageUrl !== 'string' || !/^img\/[0-9a-f]{16}\.webp$/.test(p.imageUrl)) return '';
+  return `<img class="thumb" src="${p.imageUrl}" alt="" loading="lazy" onerror="this.remove()">`;
+}
+
 function renderResultCard(entry) {
   const p = entry.product;
   const percent = Math.round(entry.score * 100);
@@ -1014,6 +1022,7 @@ function renderResultCard(entry) {
   const reason = buildReasonText(p, entry.breakdown && entry.breakdown.pairingTags);
   return `
     <div class="card ${cardClasses(p)}">
+      ${thumbHtml(p)}
       <h3>${swatchesHtml(p)}${p.name}<span class="score">一致度 ${percent}%</span></h3>
       <div class="meta">${p.price === null || p.price === undefined ? '価格不明' : p.price.toLocaleString() + '円'}${p.size ? '（' + p.size + '）' : ''} ／ ${colorMetaText(p) || ''} ／ ${p.country || '産地不明'}${p.region ? '（' + p.region + '）' : ''}</div>
       <div class="meta">${tasteLine}</div>
@@ -1073,6 +1082,7 @@ document.getElementById('clearCriteriaButton').addEventListener('click', () => {
 function renderListCard(p) {
   return `
     <div class="card ${cardClasses(p)}" data-code="${p.code}">
+      ${thumbHtml(p)}
       <h3>${swatchesHtml(p)}${p.name}</h3>
       <div class="meta">${p.price === null || p.price === undefined ? '価格不明' : p.price.toLocaleString() + '円'}${p.size ? '（' + p.size + '）' : ''} ／ ${colorMetaText(p) || ''} ／ ${p.country || '産地不明'}${p.region ? '（' + p.region + '）' : ''}</div>
       <div>${(p.varieties || []).map((v) => `<span class="tag">${v}</span>`).join('')}</div>
