@@ -251,7 +251,7 @@
       <legend>新商品を追加</legend>
       <label>商品名<input type="text" id="admName"></label>
       <label>生産者<input type="text" id="admProducer"></label>
-      <label>販売価格（円）<input type="number" id="admPrice"></label>
+      <label>販売価格（円）<input type="number" id="admPrice" min="0"></label>
       <label>容量（例：750ml）<input type="text" id="admSize"></label>
       <label>色
         <select id="admColor"></select>
@@ -273,7 +273,7 @@
       <label>対象商品
         <select id="admPriceTarget"></select>
       </label>
-      <label>新しい販売価格（円）<input type="number" id="admNewPrice"></label>
+      <label>新しい販売価格（円）<input type="number" id="admNewPrice" min="0"></label>
       <button type="button" id="admPriceButton" class="primary">価格を更新</button>
     </fieldset>
 
@@ -980,6 +980,28 @@ function colorMetaText(product) {
   return parts.join('・');
 }
 
+// スプレッドシート由来の文字列をHTMLに埋め込む前にエスケープする（XSS対策）。
+// 数値（price等）はエスケープ不要。
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function metaLineHtml(p) {
+  const price = p.price === null || p.price === undefined ? '価格不明' : p.price.toLocaleString() + '円';
+  const size = p.size ? '（' + escapeHtml(p.size) + '）' : '';
+  const region = p.region ? '（' + escapeHtml(p.region) + '）' : '';
+  return `<div class="meta">${price}${size} ／ ${escapeHtml(colorMetaText(p)) || ''} ／ ${escapeHtml(p.country) || '産地不明'}${region}</div>`;
+}
+
+// 確証度が high 以外（未設定含む）なら警告する
+function confidenceCaution(p, withCode) {
+  const lowConfidence = p.nameConfidence !== 'high' || p.attributeConfidence !== 'high';
+  if (!lowConfidence) return '';
+  const codePart = withCode ? `商品コード <span class="code">${escapeHtml(p.code)}</span> で` : '下記コードで';
+  return `<div class="caution">⚠ 情報の確証度が低めです。${codePart}現物のラベルをご確認ください</div>`;
+}
+
 function cardClasses(product) {
   return [wineColorClass(product.color), product.sparkling ? 'wine-sparkling' : ''].filter(Boolean).join(' ');
 }
@@ -997,9 +1019,9 @@ function buildReasonText(product, matchedPairingTags) {
     .map((tag) => (product.pairingReasons || {})[tag])
     .filter(Boolean);
   if (reasons.length === 0) {
-    return `<div class="reason">選択された料理（${matchedPairingTags.join('、')}）との相性が良いタイプです</div>`;
+    return `<div class="reason">選択された料理（${escapeHtml(matchedPairingTags.join('、'))}）との相性が良いタイプです</div>`;
   }
-  return `<div class="reason">${reasons.join('<br>')}</div>`;
+  return `<div class="reason">${reasons.map(escapeHtml).join('<br>')}</div>`;
 }
 
 // 画像はアプリと同じ場所の img/ に置いたファイルを使う（外部サイトには接続しない）。
@@ -1012,26 +1034,21 @@ function thumbHtml(p) {
 function renderResultCard(entry) {
   const p = entry.product;
   const percent = Math.round(entry.score * 100);
-  const lowConfidence = p.nameConfidence === 'medium' || p.nameConfidence === 'low'
-    || p.attributeConfidence === 'medium' || p.attributeConfidence === 'low' || p.attributeConfidence === 'not_found';
-  const caution = lowConfidence
-    ? `<div class="caution">⚠ 情報の確証度が低めです。商品コード <span class="code">${p.code}</span> で現物のラベルをご確認ください</div>`
-    : '';
   const tasteLine = [...(p.sweetness || []), ...(p.body || [])].join(' / ');
-  const trivia = p.trivia ? `<div class="trivia">${p.trivia}</div>` : '';
+  const trivia = p.trivia ? `<div class="trivia">${escapeHtml(p.trivia)}</div>` : '';
   const reason = buildReasonText(p, entry.breakdown && entry.breakdown.pairingTags);
   return `
     <div class="card ${cardClasses(p)}">
       ${thumbHtml(p)}
-      <h3>${swatchesHtml(p)}${p.name}<span class="score">一致度 ${percent}%</span></h3>
-      <div class="meta">${p.price === null || p.price === undefined ? '価格不明' : p.price.toLocaleString() + '円'}${p.size ? '（' + p.size + '）' : ''} ／ ${colorMetaText(p) || ''} ／ ${p.country || '産地不明'}${p.region ? '（' + p.region + '）' : ''}</div>
-      <div class="meta">${tasteLine}</div>
-      <div>${(p.tasteTags || []).map((t) => `<span class="tag">${t}</span>`).join('')}</div>
-      <div>${(p.pairingTags || []).map((t) => `<span class="tag">${t}</span>`).join('')}</div>
+      <h3>${swatchesHtml(p)}${escapeHtml(p.name)}<span class="score">一致度 ${percent}%</span></h3>
+      ${metaLineHtml(p)}
+      <div class="meta">${escapeHtml(tasteLine)}</div>
+      <div>${(p.tasteTags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
+      <div>${(p.pairingTags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
       ${reason}
       ${trivia}
-      ${caution}
-      <div class="code" style="margin-top:6px;">コード: ${p.code}</div>
+      ${confidenceCaution(p, true)}
+      <div class="code" style="margin-top:6px;">コード: ${escapeHtml(p.code)}</div>
     </div>
   `;
 }
@@ -1081,12 +1098,12 @@ document.getElementById('clearCriteriaButton').addEventListener('click', () => {
 
 function renderListCard(p) {
   return `
-    <div class="card ${cardClasses(p)}" data-code="${p.code}">
+    <div class="card ${cardClasses(p)}" data-code="${escapeHtml(p.code)}">
       ${thumbHtml(p)}
-      <h3>${swatchesHtml(p)}${p.name}</h3>
-      <div class="meta">${p.price === null || p.price === undefined ? '価格不明' : p.price.toLocaleString() + '円'}${p.size ? '（' + p.size + '）' : ''} ／ ${colorMetaText(p) || ''} ／ ${p.country || '産地不明'}${p.region ? '（' + p.region + '）' : ''}</div>
-      <div>${(p.varieties || []).map((v) => `<span class="tag">${v}</span>`).join('')}</div>
-      <div class="code" style="margin-top:6px;">コード: ${p.code}</div>
+      <h3>${swatchesHtml(p)}${escapeHtml(p.name)}</h3>
+      ${metaLineHtml(p)}
+      <div>${(p.varieties || []).map((v) => `<span class="tag">${escapeHtml(v)}</span>`).join('')}</div>
+      <div class="code" style="margin-top:6px;">コード: ${escapeHtml(p.code)}</div>
     </div>
   `;
 }
@@ -1113,23 +1130,22 @@ function openDetail(code) {
   if (!p) return;
   const tasteLine = [...(p.sweetness || []), ...(p.body || [])].join(' / ');
   const pairingReasonLines = Object.entries(p.pairingReasons || {})
-    .map(([tag, reason]) => `<div class="reason"><b>${tag}</b>：${reason}</div>`).join('');
-  const lowConfidence = p.nameConfidence === 'medium' || p.nameConfidence === 'low'
-    || p.attributeConfidence === 'medium' || p.attributeConfidence === 'low' || p.attributeConfidence === 'not_found';
+    .map(([tag, reason]) => `<div class="reason"><b>${escapeHtml(tag)}</b>：${escapeHtml(reason)}</div>`).join('');
   document.getElementById('detailContent').innerHTML = `
-    <h2>${swatchesHtml(p)}${p.name}</h2>
-    <div class="muted">${p.producer || ''}</div>
-    <div class="meta">${p.price === null || p.price === undefined ? '価格不明' : p.price.toLocaleString() + '円'}${p.size ? '（' + p.size + '）' : ''} ／ ${colorMetaText(p) || ''} ／ ${p.country || '産地不明'}${p.region ? '（' + p.region + '）' : ''}</div>
-    <div>${(p.varieties || []).map((v) => `<span class="tag">${v}</span>`).join('')}</div>
-    <p class="meta">${tasteLine}</p>
-    <div>${(p.tasteTags || []).map((t) => `<span class="tag">${t}</span>`).join('')}</div>
+    ${thumbHtml(p)}
+    <h2>${swatchesHtml(p)}${escapeHtml(p.name)}</h2>
+    <div class="muted">${escapeHtml(p.producer) || ''}</div>
+    ${metaLineHtml(p)}
+    <div>${(p.varieties || []).map((v) => `<span class="tag">${escapeHtml(v)}</span>`).join('')}</div>
+    <p class="meta">${escapeHtml(tasteLine)}</p>
+    <div>${(p.tasteTags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
     <h3>ペアリング</h3>
-    <div>${(p.pairingTags || []).map((t) => `<span class="tag">${t}</span>`).join('')}</div>
+    <div>${(p.pairingTags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
     ${pairingReasonLines}
-    ${p.trivia ? `<h3>接客トーク素材</h3><div class="trivia">${p.trivia}</div>` : ''}
+    ${p.trivia ? `<h3>接客トーク素材</h3><div class="trivia">${escapeHtml(p.trivia)}</div>` : ''}
     ${p.status === 'discontinued' ? '<div class="caution">現在は取扱終了商品です</div>' : ''}
-    ${lowConfidence ? '<div class="caution">⚠ 情報の確証度が低めです。下記コードで現物のラベルをご確認ください</div>' : ''}
-    <div class="code" style="margin-top:8px;">商品コード: ${p.code}</div>
+    ${confidenceCaution(p, false)}
+    <div class="code" style="margin-top:8px;">商品コード: ${escapeHtml(p.code)}</div>
   `;
   document.getElementById('detailOverlay').classList.remove('hidden');
 }
@@ -1159,8 +1175,8 @@ function populateAdminSelects() {
   renderCheckboxGroup('admBodyFields', 'admBody', BODY_LEVELS);
   const active = PRODUCTS.filter((p) => p.status !== 'discontinued');
   const discontinued = PRODUCTS.filter((p) => p.status === 'discontinued');
-  const activeOptions = active.map((p) => `<option value="${p.code}">${p.name}</option>`).join('');
-  const discontinuedOptions = discontinued.map((p) => `<option value="${p.code}">${p.name}</option>`).join('');
+  const activeOptions = active.map((p) => `<option value="${escapeHtml(p.code)}">${escapeHtml(p.name)}</option>`).join('');
+  const discontinuedOptions = discontinued.map((p) => `<option value="${escapeHtml(p.code)}">${escapeHtml(p.name)}</option>`).join('');
   document.getElementById('admPriceTarget').innerHTML = activeOptions;
   document.getElementById('admDiscontinueTarget').innerHTML = activeOptions;
   document.getElementById('admReactivateTarget').innerHTML = discontinuedOptions;
@@ -1212,7 +1228,7 @@ document.getElementById('admAddButton').addEventListener('click', async () => {
     code: 'W-' + Date.now(),
     name,
     producer: document.getElementById('admProducer').value.trim() || null,
-    price: Number(document.getElementById('admPrice').value) || null,
+    price: parsePriceInput('admPrice'),
     size: document.getElementById('admSize').value.trim() || null,
     color: document.getElementById('admColor').value || null,
     sparkling: document.getElementById('admSparkling').checked,
@@ -1236,8 +1252,8 @@ document.getElementById('admAddButton').addEventListener('click', async () => {
 
 document.getElementById('admPriceButton').addEventListener('click', async () => {
   const code = document.getElementById('admPriceTarget').value;
-  const newPrice = Number(document.getElementById('admNewPrice').value);
-  if (!code || !newPrice) { showAdminMsg('対象商品と新価格を指定してください', false); return; }
+  const newPrice = parsePriceInput('admNewPrice');
+  if (!code || newPrice === null) { showAdminMsg('対象商品と新価格を指定してください', false); return; }
   const success = await callAppsScript({ action: 'update', code, patch: { price: newPrice } });
   if (success) showAdminMsg('価格を更新しました', true);
 });
