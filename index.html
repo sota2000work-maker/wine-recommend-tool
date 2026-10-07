@@ -791,6 +791,8 @@ const STORAGE_KEY = 'wineToolCache_v1';
 const STAFF_PASSCODE_KEY = 'wineToolStaffPasscode_v1';
 
 let PRODUCTS = [];
+// 管理パスコードで認証できた場合にのみ入る、取扱終了品の配列（PRODUCTSには混ぜない）
+let ADMIN_DISCONTINUED = [];
 
 function loadCache() {
   try {
@@ -832,13 +834,16 @@ function updateSyncStatus() {
 }
 
 // スタッフパスコードを添えてApps Scriptから最新データを取得する。
-// 戻り値: { ok, reason } reasonは 'network'（通信不可）/ 'invalid'（パスコード誤り）/ 'not_configured'
-async function syncFromServer(passcode, silent) {
+// adminPasscodeを渡すと、それが管理パスコードと一致した場合のみ取扱終了品(ADMIN_DISCONTINUED)も取得する。
+// 戻り値: { ok, reason } reasonは 'network'（通信不可）/ 'invalid'（スタッフパスコード誤り）/
+//        'admin_invalid'（管理パスコード誤り）/ 'not_configured'
+async function syncFromServer(passcode, silent, adminPasscode) {
   if (!APPS_SCRIPT_URL) {
     return { ok: false, reason: 'not_configured' };
   }
   try {
-    const url = APPS_SCRIPT_URL + '?passcode=' + encodeURIComponent(passcode);
+    let url = APPS_SCRIPT_URL + '?passcode=' + encodeURIComponent(passcode);
+    if (adminPasscode) url += '&adminPasscode=' + encodeURIComponent(adminPasscode);
     const res = await fetch(url, { method: 'GET' });
     const data = await res.json();
     if (data.error === 'passcode_invalid') {
@@ -849,6 +854,12 @@ async function syncFromServer(passcode, silent) {
     saveCache(PRODUCTS);
     updateSyncStatus();
     renderListResults();
+    if (adminPasscode) {
+      if (!data.discontinuedProducts) {
+        return { ok: false, reason: 'admin_invalid' };
+      }
+      ADMIN_DISCONTINUED = data.discontinuedProducts;
+    }
     populateAdminSelects();
     return { ok: true };
   } catch (e) {
@@ -1158,23 +1169,28 @@ document.getElementById('detailCloseButton').addEventListener('click', () => {
 
 let adminPasscodeValue = '';
 
-document.getElementById('adminUnlockButton').addEventListener('click', () => {
+document.getElementById('adminUnlockButton').addEventListener('click', async () => {
   const value = document.getElementById('adminPasscode').value;
   if (!value) {
     alert('パスコードを入力してください');
     return;
   }
+  const staffPasscode = localStorage.getItem(STAFF_PASSCODE_KEY) || '';
+  const result = await syncFromServer(staffPasscode, true, value);
+  if (!result.ok) {
+    alert('パスコードが正しくありません。');
+    return;
+  }
   adminPasscodeValue = value;
   document.getElementById('adminBody').style.display = 'block';
-  populateAdminSelects();
 });
 
 function populateAdminSelects() {
   renderSelectOptions('admColor', COLORS);
   renderCheckboxGroup('admSweetnessFields', 'admSweetness', SWEETNESS_LEVELS);
   renderCheckboxGroup('admBodyFields', 'admBody', BODY_LEVELS);
-  const active = PRODUCTS.filter((p) => p.status !== 'discontinued');
-  const discontinued = PRODUCTS.filter((p) => p.status === 'discontinued');
+  const active = PRODUCTS; // サーバー側で既に取扱中のみに絞り込まれている
+  const discontinued = ADMIN_DISCONTINUED; // 管理パスコードで認証済みの場合のみ入っている
   const activeOptions = active.map((p) => `<option value="${escapeHtml(p.code)}">${escapeHtml(p.name)}</option>`).join('');
   const discontinuedOptions = discontinued.map((p) => `<option value="${escapeHtml(p.code)}">${escapeHtml(p.name)}</option>`).join('');
   document.getElementById('admPriceTarget').innerHTML = activeOptions;
@@ -1209,7 +1225,7 @@ async function callAppsScript(payload) {
       return false;
     }
     const staffPasscode = localStorage.getItem(STAFF_PASSCODE_KEY) || '';
-    await syncFromServer(staffPasscode, true);
+    await syncFromServer(staffPasscode, true, adminPasscodeValue || null);
     return true;
   } catch (e) {
     showAdminMsg('通信エラーが発生しました。通信環境をご確認ください。', false);
@@ -1275,7 +1291,7 @@ document.getElementById('admReactivateButton').addEventListener('click', async (
 document.getElementById('admDeleteButton').addEventListener('click', () => {
   const code = document.getElementById('admDeleteTarget').value;
   if (!code) { showAdminMsg('対象商品を選択してください', false); return; }
-  const product = PRODUCTS.find((p) => p.code === code);
+  const product = ADMIN_DISCONTINUED.find((p) => p.code === code);
   document.getElementById('admDeleteConfirmName').textContent = product ? product.name : code;
   document.getElementById('admDeleteConfirm').classList.remove('hidden');
 });
