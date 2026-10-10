@@ -129,6 +129,7 @@
 <div class="syncBar">
   <span id="syncStatus">同期状況を確認中...</span>
   <button type="button" id="syncButton" class="secondary" style="padding:4px 10px;font-size:12px;">今すぐ同期</button>
+  <button type="button" id="logoutButton" class="secondary" style="padding:4px 10px;font-size:12px;">ログアウト</button>
 </div>
 
 <div class="tabBar">
@@ -399,19 +400,21 @@ function scoreProduct(product, criteria) {
     || (criteria.priceMax !== null && criteria.priceMax !== undefined);
 
   if (hasFreePriceRange) {
+    // 価格条件が指定されている場合は常にtotalCriteriaに数える。価格不明の商品は「不一致」として扱う
+    // （以前は価格不明をtotalCriteriaから除外していたため、価格条件つき検索で不当に高スコアになっていた。2026-10修正）。
+    totalCriteria++;
     if (product.price !== null && product.price !== undefined) {
-      totalCriteria++;
       const min = criteria.priceMin !== null && criteria.priceMin !== undefined ? criteria.priceMin : -Infinity;
       const max = criteria.priceMax !== null && criteria.priceMax !== undefined ? criteria.priceMax : Infinity;
       const matched = product.price >= min && product.price <= max;
       if (matched) matchedCount++;
       breakdown.price = matched;
     } else {
-      breakdown.price = null;
+      breakdown.price = null; // 表示側で「価格不明」と「価格条件外」を区別できるようnullのまま
     }
   } else if (criteria.priceBandIds && criteria.priceBandIds.length > 0) {
+    totalCriteria++;
     if (product.price !== null && product.price !== undefined) {
-      totalCriteria++;
       const bandIds = priceBandsForProduct(product.price);
       const matched = bandIds.some((id) => criteria.priceBandIds.includes(id));
       if (matched) matchedCount++;
@@ -842,9 +845,9 @@ async function syncFromServer(passcode, silent, adminPasscode) {
     return { ok: false, reason: 'not_configured' };
   }
   try {
-    let url = APPS_SCRIPT_URL + '?passcode=' + encodeURIComponent(passcode);
-    if (adminPasscode) url += '&adminPasscode=' + encodeURIComponent(adminPasscode);
-    const res = await fetch(url, { method: 'GET' });
+    const body = { action: 'sync', passcode };
+    if (adminPasscode) body.adminPasscode = adminPasscode;
+    const res = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(body) });
     const data = await res.json();
     if (data.error === 'passcode_invalid') {
       return { ok: false, reason: 'invalid' };
@@ -871,6 +874,13 @@ async function syncFromServer(passcode, silent, adminPasscode) {
 document.getElementById('syncButton').addEventListener('click', async () => {
   const passcode = localStorage.getItem(STAFF_PASSCODE_KEY) || '';
   await syncFromServer(passcode, false);
+});
+
+document.getElementById('logoutButton').addEventListener('click', () => {
+  if (!confirm('ログアウトしますか？この端末に保存されているパスコードを消去します。')) return;
+  localStorage.removeItem(STAFF_PASSCODE_KEY);
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
 });
 
 // ---------- 起動時認証ゲート ----------
