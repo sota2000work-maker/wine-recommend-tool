@@ -1054,14 +1054,15 @@ function thumbHtml(p) {
 
 function renderResultCard(entry) {
   const p = entry.product;
-  const percent = Math.round(entry.score * 100);
+  // フリーワードだけで検索した場合は一致度を計算する条件がなく、全件「0%」と出て誤解を招くため表示しない（2026-10修正）
+  const scoreBadge = entry.totalCriteria > 0 ? `<span class="score">一致度 ${Math.round(entry.score * 100)}%</span>` : '';
   const tasteLine = [...(p.sweetness || []), ...(p.body || [])].join(' / ');
   const trivia = p.trivia ? `<div class="trivia">${escapeHtml(p.trivia)}</div>` : '';
   const reason = buildReasonText(p, entry.breakdown && entry.breakdown.pairingTags);
   return `
     <div class="card ${cardClasses(p)}">
       ${thumbHtml(p)}
-      <h3>${swatchesHtml(p)}${escapeHtml(p.name)}<span class="score">一致度 ${percent}%</span></h3>
+      <h3>${swatchesHtml(p)}${escapeHtml(p.name)}${scoreBadge}</h3>
       ${metaLineHtml(p)}
       <div class="meta">${escapeHtml(tasteLine)}</div>
       <div>${(p.tasteTags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
