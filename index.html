@@ -105,6 +105,25 @@
   .authBox h2 { font-size: 19px; margin: 0 0 4px; color: var(--wine-dark); text-align: center; }
   .authBox .muted { text-align: center; margin-bottom: 14px; }
 
+  .learnToc { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 6px; }
+  .learnToc.hidden { display: none; }
+  .learnToc button { margin: 0; padding: 6px 12px; font-size: 13px; border-radius: 999px; }
+  .learnSection h2 { font-size: 17px; color: var(--wine-dark); margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border); scroll-margin-top: 64px; }
+  .learnItem { border: 1px solid var(--border); border-left: 4px solid var(--gold); border-radius: 12px; margin-bottom: 8px; background: var(--paper); }
+  .learnItem summary { padding: 11px 14px; font-weight: 600; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .learnItem summary::-webkit-details-marker { display: none; }
+  .learnItem summary::after { content: '＋'; color: var(--gold); font-weight: 700; flex-shrink: 0; }
+  .learnItem[open] summary::after { content: '－'; }
+  .learnBody { padding: 0 14px 12px; font-size: 14px; }
+  .learnBody p { margin: 0 0 8px; }
+  .learnTableWrap { overflow-x: auto; margin: 0 0 8px; }
+  .learnTable { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .learnTable th, .learnTable td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; vertical-align: top; }
+  .learnTable th { background: var(--cream); white-space: nowrap; }
+  .learnTable td:first-child { white-space: nowrap; font-weight: 600; }
+  .learnTalk { font-size: 14px; color: var(--wine-dark); background: var(--gold-soft); padding: 8px 10px; border-radius: 8px; border-left: 3px solid var(--gold); }
+  .learnTalk b { font-size: 12px; }
+
   @media (max-width: 480px) {
     body { padding: 10px 8px 28px; font-size: 15px; }
     label { display: block; }
@@ -200,42 +219,10 @@
 </section>
 
 <section id="tab-learn" class="tabPanel">
-  <p class="muted">接客中に説明に困りやすい基本用語をまとめました。</p>
-
-  <div class="card">
-    <h3>ボディ</h3>
-    <div class="meta">口に含んだときの重さ・飲みごたえのこと。「軽め」はさらっと軽快、「重め」は濃厚でしっかりした飲み応え。一般に、アルコール度数や渋み・凝縮感が強いほどボディは重くなる傾向がある。</div>
-  </div>
-
-  <div class="card">
-    <h3>タンニン</h3>
-    <div class="meta">主に赤ワインに含まれる渋み成分。ブドウの皮や種、樽由来で生まれる。タンニンが強いワインは「渋め」「しっかりした」と表現され、脂の多い肉料理などと好相性。白ワインにはほとんど含まれない。</div>
-  </div>
-
-  <div class="card">
-    <h3>酸味</h3>
-    <div class="meta">ワインのフレッシュさ・キレを感じさせる要素。酸味が強いと「爽やか」「シャープ」、弱いと「まろやか」と表現される。酸味の強いワインは、油分の多い料理や魚介と合わせやすい。</div>
-  </div>
-
-  <div class="card">
-    <h3>甘辛度（辛口〜甘口）</h3>
-    <div class="meta">残糖（発酵しきらずに残った糖分）の量によって決まる甘さの度合い。「辛口」は糖分がほぼ残らずすっきり、「甘口」は糖分が多く残り甘さを感じる。食中酒には辛口〜中口が選ばれやすい。</div>
-  </div>
-
-  <div class="card">
-    <h3>ブドウ品種とは</h3>
-    <div class="meta">ワインの原料になるブドウの種類。品種によって色・香り・味わいの傾向が大きく変わる。同じ産地でも品種が違えば味は別物になるため、「品種名」はお客様の好みを推測する手がかりになる。</div>
-  </div>
-
-  <div class="card">
-    <h3>産地・地方の読み方の基本</h3>
-    <div class="meta">「国」の下に「地方（例：ボルドー、トスカーナ）」があり、同じ国でも地方によって気候や土壌が異なるため味わいの傾向も変わる。産地名だけでも、ある程度どんな味わいかの見当をつけられる。</div>
-  </div>
-
-  <div class="card">
-    <h3>スワリング・デキャンタージュ</h3>
-    <div class="meta">スワリングはグラスを回して香りを立たせる所作。デキャンタージュは別容器に移し替えて空気に触れさせ、香りを開かせたり澱を取り除いたりすること。若く渋みの強い赤ワインなどで効果が出やすい。</div>
-  </div>
+  <p class="muted">接客中に説明に困りやすい基本用語をまとめました。見出しをタップすると説明が開きます。</p>
+  <input type="text" id="learnSearch" placeholder="用語・説明文を検索">
+  <div id="learnToc" class="learnToc"></div>
+  <div id="learnContent"></div>
 </section>
 
 <section id="tab-admin" class="tabPanel">
@@ -1319,6 +1306,119 @@ document.getElementById('admDeleteConfirmButton').addEventListener('click', asyn
   if (success) showAdminMsg('完全に削除しました', true);
 });
 
+// ---------- 学ぶタブ ----------
+
+// 基礎知識（1項目＝用語・説明・接客での一言。比較表がある項目のみ table を持つ）
+const LEARN_SECTIONS = [
+  {
+    title: '味わいの用語',
+    items: [
+      {
+        term: 'ボディ',
+        body: '口に含んだときの重さ・飲みごたえのこと。「軽め」はさらっと軽快、「重め」は濃厚でしっかりした飲み応え。一般に、アルコール度数や渋み・凝縮感が強いほどボディは重くなる傾向がある。',
+        talk: '軽めのものは食事に合わせやすく、重めのものはお肉料理やゆっくり飲みたいときにおすすめです。',
+      },
+      {
+        term: 'タンニン',
+        body: '主に赤ワインに含まれる渋み成分。ブドウの皮や種、樽由来で生まれる。タンニンが強いワインは「渋め」「しっかりした」と表現され、脂の多い肉料理などと好相性。白ワインにはほとんど含まれない。',
+        talk: '渋みのしっかりした赤ワインは、お肉の脂と合わせると渋みがやわらいで感じられます。',
+      },
+      {
+        term: '酸味',
+        body: 'ワインのフレッシュさ・キレを感じさせる要素。酸味が強いと「爽やか」「シャープ」、弱いと「まろやか」と表現される。酸味の強いワインは、油分の多い料理や魚介と合わせやすい。',
+        talk: '酸味のあるワインは、揚げ物や魚介料理をさっぱりさせてくれます。',
+      },
+      {
+        term: '甘辛度（辛口〜甘口）',
+        body: '残糖（発酵しきらずに残った糖分）の量によって決まる甘さの度合い。「辛口」は糖分がほぼ残らずすっきり、「甘口」は糖分が多く残り甘さを感じる。食中酒には辛口〜中口が選ばれやすい。',
+        talk: 'お食事と一緒なら辛口、デザートや食後にゆっくりなら甘口がおすすめです。',
+      },
+    ],
+  },
+  {
+    title: '品種・産地',
+    items: [
+      {
+        term: 'ブドウ品種とは',
+        body: 'ワインの原料になるブドウの種類。品種によって色・香り・味わいの傾向が大きく変わる。同じ産地でも品種が違えば味は別物になるため、「品種名」はお客様の好みを推測する手がかりになる。',
+        talk: 'お好きなワインの品種がわかれば、似た味わいのものをご案内できます。',
+      },
+      {
+        term: '産地・地方の読み方の基本',
+        body: '「国」の下に「地方（例：ボルドー、トスカーナ）」があり、同じ国でも地方によって気候や土壌が異なるため味わいの傾向も変わる。産地名だけでも、ある程度どんな味わいかの見当をつけられる。',
+        talk: '同じ品種でも産地によって味わいが変わるので、飲み比べも楽しいですよ。',
+      },
+    ],
+  },
+  {
+    title: '飲み方・扱い',
+    items: [
+      {
+        term: 'スワリング・デキャンタージュ',
+        body: 'スワリングはグラスを回して香りを立たせる所作。デキャンタージュは別容器に移し替えて空気に触れさせ、香りを開かせたり澱を取り除いたりすること。若く渋みの強い赤ワインなどで効果が出やすい。',
+        talk: 'グラスを軽く回すと香りが開いて、より楽しめます。',
+      },
+    ],
+  },
+];
+
+function glossaryItems(glossary) {
+  return Object.entries(glossary).map(([term, body]) => ({ term, body }));
+}
+
+function normalizeLearnText(str) {
+  return String(str).normalize('NFKC').toLowerCase();
+}
+
+function learnItemHtml(item) {
+  const table = item.table
+    ? `<div class="learnTableWrap"><table class="learnTable"><tr>${item.table.head.map((h) => `<th>${escapeHtml(h)}</th>`).join('')}</tr>${item.table.rows.map((r) => `<tr>${r.map((c) => `<td>${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}</table></div>`
+    : '';
+  const talk = item.talk ? `<div class="learnTalk"><b>接客での一言</b><br>「${escapeHtml(item.talk)}」</div>` : '';
+  return `<details class="learnItem"><summary>${escapeHtml(item.term)}</summary><div class="learnBody"><p>${escapeHtml(item.body)}</p>${table}${talk}</div></details>`;
+}
+
+function renderLearn() {
+  document.getElementById('learnToc').innerHTML = LEARN_SECTIONS.map((s, i) =>
+    `<button type="button" class="secondary" data-learn-jump="${i}">${escapeHtml(s.title)}</button>`).join('');
+  document.getElementById('learnContent').innerHTML = LEARN_SECTIONS.map((s, i) =>
+    `<div class="learnSection" id="learnSection${i}"><h2>${escapeHtml(s.title)}</h2>${s.items.map(learnItemHtml).join('')}</div>`).join('')
+    + '<p id="learnEmpty" class="muted hidden">該当する用語がありません。</p>';
+
+  // 検索用の文字列は用語・説明・一言・表の中身をまとめて持たせる
+  const items = LEARN_SECTIONS.flatMap((s) => s.items);
+  document.querySelectorAll('#learnContent .learnItem').forEach((el, i) => {
+    const item = items[i];
+    const tableText = item.table ? item.table.head.concat(...item.table.rows).join(' ') : '';
+    el.dataset.search = normalizeLearnText([item.term, item.body, item.talk || '', tableText].join(' '));
+  });
+}
+
+function filterLearn() {
+  const q = normalizeLearnText(document.getElementById('learnSearch').value.trim());
+  let anyHit = false;
+  document.querySelectorAll('#learnContent .learnSection').forEach((sec) => {
+    let secHit = false;
+    sec.querySelectorAll('.learnItem').forEach((el) => {
+      const hit = !q || el.dataset.search.includes(q);
+      el.classList.toggle('hidden', !hit);
+      el.open = Boolean(q) && hit;
+      if (hit) secHit = true;
+    });
+    sec.classList.toggle('hidden', !secHit);
+    if (secHit) anyHit = true;
+  });
+  document.getElementById('learnEmpty').classList.toggle('hidden', anyHit);
+  document.getElementById('learnToc').classList.toggle('hidden', Boolean(q));
+}
+
+document.getElementById('learnSearch').addEventListener('input', filterLearn);
+
+document.getElementById('learnToc').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-learn-jump]');
+  if (btn) document.getElementById('learnSection' + btn.getAttribute('data-learn-jump')).scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
 // ---------- タブ切り替え ----------
 
 document.querySelectorAll('.tabBtn').forEach((btn) => {
@@ -1336,6 +1436,7 @@ function startApp() {
   initForm();
   updateRegionField();
   renderListResults();
+  renderLearn();
   updateSyncStatus();
   populateAdminSelects();
 }
