@@ -1120,9 +1120,13 @@ function renderListCard(p) {
 function renderListResults() {
   const q = (document.getElementById('listSearch').value || '').trim();
   const active = PRODUCTS.filter((p) => p.status !== 'discontinued');
-  const filtered = q
-    ? active.filter((p) => [p.name, p.country, p.region, ...(p.varieties || [])].filter(Boolean).some((v) => v.includes(q)))
-    : active;
+  // 国名そのものを入力したときは国で絞る（「チリ」で産地「シチリア」が出ないように）
+  const isCountry = active.some((p) => p.country === q);
+  const filtered = !q
+    ? active
+    : isCountry
+      ? active.filter((p) => p.country === q)
+      : active.filter((p) => [p.name, p.country, p.region, ...(p.varieties || [])].filter(Boolean).some((v) => v.includes(q)));
   const container = document.getElementById('listResults');
   container.innerHTML = filtered.map(renderListCard).join('');
   container.querySelectorAll('.card').forEach((card) => {
