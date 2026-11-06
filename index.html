@@ -86,6 +86,7 @@
   }
   .code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; color: var(--ink-soft); letter-spacing: .02em; }
   .caution { color: #8a3b1c; font-size: 12px; background: #fbeee5; padding: 6px 8px; border-radius: 6px; margin-top: 6px; }
+  .tag.vegan { background: #e6f2e1; border-color: #9cc48a; color: #2f5a1f; font-weight: 600; }
   .muted { color: var(--ink-soft); font-size: 13px; }
   .syncBar { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--ink-soft); margin-bottom: 6px; }
   #regionField { display: none; }
@@ -184,6 +185,7 @@
       <legend>色</legend>
       <div id="colorFields"></div>
       <label style="display:block;margin-top:8px;"><input type="checkbox" id="sparklingOnly">スパークリングのみ表示</label>
+      <label style="display:block;margin-top:4px;"><input type="checkbox" id="veganOnly">ヴィーガン認証のみ表示</label>
     </fieldset>
 
     <fieldset>
@@ -245,6 +247,8 @@
         <select id="admColor"></select>
       </label>
       <label><input type="checkbox" id="admSparkling">スパークリング</label>
+      <label><input type="checkbox" id="admVegan">ヴィーガン認証（第三者機関の認証マークあり。稲葉ナチュラルだけのものは対象外）</label>
+      <label>ヴィーガン認証の根拠（認証にチェックしたときは必須）<input type="text" id="admVeganSource" placeholder="例：裏ラベルにEVE VEGANマーク"></label>
       <label>国<input type="text" id="admCountry" placeholder="例：フランス"></label>
       <label>地方（任意）<input type="text" id="admRegion"></label>
       <label>品種（カンマ区切り・任意）<input type="text" id="admVarieties"></label>
@@ -418,13 +422,6 @@ function scoreProduct(product, criteria) {
     breakdown.color = matched;
   }
 
-  if (criteria.sparklingOnly) {
-    totalCriteria++;
-    const matched = product.sparkling === true;
-    if (matched) matchedCount++;
-    breakdown.sparkling = matched;
-  }
-
   if (criteria.countries && criteria.countries.length > 0) {
     totalCriteria++;
     const matched = product.country != null && criteria.countries.includes(product.country);
@@ -485,8 +482,21 @@ function matchesFreeText(product, text) {
     .filter(Boolean).some((v) => v.includes(text));
 }
 
+// スプレッドシート由来の真偽値は true（チェックボックス）でも "TRUE"（文字列）でも来うるのでそろえる
+function isTrue(v) {
+  return v === true || String(v).toLowerCase() === 'true';
+}
+
+// 「〜のみ」のチェックは点数ではなく絞り込み。該当しない商品は結果に出さない（2026-11 変更。
+// 以前の「スパークリングのみ表示」は加点方式で、スパークリング以外も下位に出ていた）
+function passesFilters(product, criteria) {
+  if (criteria.sparklingOnly && !isTrue(product.sparkling)) return false;
+  if (criteria.veganOnly && !isTrue(product.vegan)) return false;
+  return true;
+}
+
 function rankProducts(products, criteria, topN) {
-  const active = products.filter((p) => p.status !== 'discontinued' && matchesFreeText(p, criteria.freeText));
+  const active = products.filter((p) => p.status !== 'discontinued' && matchesFreeText(p, criteria.freeText) && passesFilters(p, criteria));
   const scored = active.map((p) => ({ product: p, ...scoreProduct(p, criteria) }));
   scored.sort((a, b) => b.score - a.score || b.matchedCount - a.matchedCount);
   return scored.slice(0, topN);
@@ -1021,6 +1031,10 @@ function swatchesHtml(product) {
   return colorSwatch + sparklingSwatch;
 }
 
+function veganTagHtml(p) {
+  return isTrue(p.vegan) ? '<span class="tag vegan">ヴィーガン認証</span>' : '';
+}
+
 function buildReasonText(product, matchedPairingTags) {
   if (!matchedPairingTags || matchedPairingTags.length === 0) return '';
   const reasons = matchedPairingTags
@@ -1051,6 +1065,7 @@ function renderResultCard(entry) {
       ${thumbHtml(p)}
       <h3>${swatchesHtml(p)}${escapeHtml(p.name)}${scoreBadge}</h3>
       ${metaLineHtml(p)}
+      ${veganTagHtml(p)}
       <div class="meta">${escapeHtml(tasteLine)}</div>
       <div>${(p.tasteTags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
       <div>${(p.pairingTags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
@@ -1079,6 +1094,7 @@ document.getElementById('searchButton').addEventListener('click', () => {
     priceMax: parsePriceInput('priceMaxInput'),
     colors: getCheckedValues('color'),
     sparklingOnly: document.getElementById('sparklingOnly').checked,
+    veganOnly: document.getElementById('veganOnly').checked,
     countries: getCheckedValues('country'),
     regions: getCheckedValues('region'),
     varieties: getCheckedValues('variety'),
@@ -1111,6 +1127,7 @@ function renderListCard(p) {
       ${thumbHtml(p)}
       <h3>${swatchesHtml(p)}${escapeHtml(p.name)}</h3>
       ${metaLineHtml(p)}
+      ${veganTagHtml(p)}
       <div>${(p.varieties || []).map((v) => `<span class="tag">${escapeHtml(v)}</span>`).join('')}</div>
       <div class="code" style="margin-top:6px;">コード: ${escapeHtml(p.code)}</div>
     </div>
@@ -1149,6 +1166,7 @@ function openDetail(code) {
     <h2>${swatchesHtml(p)}${escapeHtml(p.name)}</h2>
     <div class="muted">${escapeHtml(p.producer) || ''}</div>
     ${metaLineHtml(p)}
+    ${isTrue(p.vegan) ? `<div>${veganTagHtml(p)}<span class="muted">根拠: ${escapeHtml(p.veganSource) || '未記入'}</span></div>` : ''}
     <div>${(p.varieties || []).map((v) => `<span class="tag">${escapeHtml(v)}</span>`).join('')}</div>
     <p class="meta">${escapeHtml(tasteLine)}</p>
     <div>${(p.tasteTags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
@@ -1242,6 +1260,9 @@ function splitCsv(text) {
 document.getElementById('admAddButton').addEventListener('click', async () => {
   const name = document.getElementById('admName').value.trim();
   if (!name) { showAdminMsg('商品名を入力してください', false); return; }
+  const vegan = document.getElementById('admVegan').checked;
+  const veganSource = document.getElementById('admVeganSource').value.trim() || null;
+  if (vegan && !veganSource) { showAdminMsg('ヴィーガン認証の根拠を入力してください', false); return; }
   const product = {
     code: 'W-' + Date.now(),
     name,
@@ -1250,6 +1271,8 @@ document.getElementById('admAddButton').addEventListener('click', async () => {
     size: document.getElementById('admSize').value.trim() || null,
     color: document.getElementById('admColor').value || null,
     sparkling: document.getElementById('admSparkling').checked,
+    vegan,
+    veganSource: vegan ? veganSource : null,
     country: document.getElementById('admCountry').value.trim() || null,
     region: document.getElementById('admRegion').value.trim() || null,
     varieties: splitCsv(document.getElementById('admVarieties').value),
