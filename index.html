@@ -182,6 +182,19 @@
   .pcard h3 .swatch { margin-right: 6px; vertical-align: 1px; }
   .highlight { color: var(--wine-dark); background: var(--gold-soft); padding: 8px 10px; border-radius: 8px; border-left: 3px solid var(--gold); }
   .pcTags .tag.taste { background: #f6eef1; border-color: #e3cbd5; color: var(--wine-dark); }
+  /* ワインだけ：甘辛（5段階）・ボディ（3段階）の目盛り（2026-11-15） */
+  .tscale { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 8px; align-items: center; margin: 4px 0 2px; font-size: 12px; }
+  .tscale .tsLabel { color: var(--ink-soft); font-weight: 700; white-space: nowrap; }
+  .tsRow { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .tsTrack { display: flex; gap: 2px; flex: 0 0 auto; }
+  .tsTrack i { display: block; width: 14px; height: 8px; border-radius: 2px; background: #ece3d8; }
+  .tsTrack.n3 i { width: 24px; }
+  .tsTrack i.on { background: var(--wine); }
+  .tsValue { color: var(--wine-dark); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tsEnd { color: var(--ink-soft); font-size: 11px; white-space: nowrap; }
+  .tscale.big { font-size: 14px; gap: 8px 10px; margin: 8px 0; }
+  .tscale.big .tsTrack i { width: 22px; height: 12px; }
+  .tscale.big .tsTrack.n3 i { width: 38px; }
   .pcard > .reason { margin: 4px 0 0; font-size: 13px; }
   /* 価格の自由入力欄がスマホ幅からはみ出していた（既存の不具合、2026-11 修正） */
   #criteriaForm fieldset { min-width: 0; }
@@ -1274,10 +1287,35 @@ function cardOriginText(p) {
   return (color ? color + ' ／ ' : '') + origin;
 }
 
+// 甘辛（5段階）・ボディ（3段階）の目盛り。値が2つ（例：軽め〜ミディアム）のときは間をすべて塗る。
+// big=true は詳細画面用（両端の言葉と用語説明ⓘを付ける）
+function tasteScaleHtml(p, big) {
+  const rows = [
+    { label: '甘辛', term: '甘辛度', levels: SWEETNESS_LEVELS, values: p.sweetness || [] },
+    { label: 'ボディ', term: 'ボディ', levels: BODY_LEVELS, values: p.body || [] },
+  ];
+  const html = rows.map((r) => {
+    const idx = r.values.map((v) => r.levels.indexOf(v)).filter((i) => i >= 0);
+    if (!idx.length) return '';
+    const lo = Math.min(...idx), hi = Math.max(...idx);
+    const text = lo === hi ? r.levels[lo] : r.levels[lo] + '〜' + r.levels[hi];
+    const cells = r.levels.map((_, i) => `<i${i >= lo && i <= hi ? ' class="on"' : ''}></i>`).join('');
+    const track = `<span class="tsTrack n${r.levels.length}" role="img" aria-label="${escapeHtml(r.label)}：${escapeHtml(text)}（${r.levels.length}段階）">${cells}</span>`;
+    const label = big
+      ? `<span class="tsLabel">${escapeHtml(r.label)} <span class="tag glossary" data-term="${escapeHtml(r.term)}" style="padding:0 5px;font-size:11px;">ⓘ</span></span>`
+      : `<span class="tsLabel">${escapeHtml(r.label)}</span>`;
+    const row = big
+      ? `<span class="tsRow"><span class="tsEnd">${escapeHtml(r.levels[0])}</span>${track}<span class="tsEnd">${escapeHtml(r.levels[r.levels.length - 1])}</span><span class="tsValue">${escapeHtml(text)}</span></span>`
+      : `<span class="tsRow">${track}<span class="tsValue">${escapeHtml(text)}</span></span>`;
+    return label + row;
+  }).join('');
+  return html ? `<div class="tscale${big ? ' big' : ''}">${html}</div>` : '';
+}
+
 function cardTagsHtml(p) {
   const tag = (t, cls) => `<span class="tag${cls ? ' ' + cls : ''}">${escapeHtml(t)}</span>`;
-  return veganTagHtml(p)
-    + [...(p.sweetness || []), ...(p.body || [])].map((t) => tag(t, 'taste')).join('')
+  return tasteScaleHtml(p, false)
+    + veganTagHtml(p)
     + (p.tasteTags || []).map((t) => glossaryTagHtml(t)).join('')
     + (p.pairingTags || []).map((t) => tag(t, 'sv')).join('');
 }
@@ -1475,7 +1513,6 @@ document.getElementById('listSort').addEventListener('change', renderListResults
 function openDetail(code) {
   const p = PRODUCTS.find((x) => x.code === code);
   if (!p) return;
-  const tasteLine = [...(p.sweetness || []), ...(p.body || [])].join(' / ');
   const pairingReasonLines = Object.entries(p.pairingReasons || {})
     .map(([tag, reason]) => `<div class="reason"><b>${escapeHtml(tag)}</b>：${escapeHtml(reason)}</div>`).join('');
   document.getElementById('detailContent').innerHTML = `
@@ -1485,7 +1522,7 @@ function openDetail(code) {
     ${metaLineHtml(p)}
     ${isTrue(p.vegan) ? `<div>${veganTagHtml(p)}<span class="muted">根拠: ${escapeHtml(p.veganSource) || '未記入'}</span></div>` : ''}
     <div>${(p.varieties || []).map((v) => `<span class="tag">${escapeHtml(v)}</span>`).join('')}</div>
-    <p class="meta">${escapeHtml(tasteLine)}</p>
+    ${tasteScaleHtml(p, true)}
     <div>${(p.tasteTags || []).map((t) => glossaryTagHtml(t)).join('')}</div>
     <h3>ペアリング</h3>
     <div>${(p.pairingTags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
