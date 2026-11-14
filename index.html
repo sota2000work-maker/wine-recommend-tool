@@ -26,6 +26,11 @@
     --white-swatch: #cbb26a;
     --rose-swatch: #d98a99;
     --sparkling-swatch: #c9a961;
+    /* 3ツール共通の画面部品（検索・結果カード・一覧）はこの別名だけを使う */
+    --accent: var(--wine);
+    --accent-dark: var(--wine-dark);
+    --accent-soft: var(--gold-soft);
+    --accent-line: var(--gold);
   }
   * { box-sizing: border-box; }
   body {
@@ -125,6 +130,62 @@
   .learnTalk { font-size: 14px; color: var(--wine-dark); background: var(--gold-soft); padding: 8px 10px; border-radius: 8px; border-left: 3px solid var(--gold); }
   .learnTalk b { font-size: 12px; }
 
+  /* ===== 3ツール共通：検索条件の丸ボタン・結果の帯・下の固定ボタン・商品カード・一覧の絞り込み（2026-11） ===== */
+  #criteriaForm label:has(> input[type="checkbox"]) {
+    position: relative; display: inline-flex; align-items: center; gap: 4px; margin: 4px 6px 4px 0; padding: 7px 12px;
+    border: 1px solid var(--border); border-radius: 999px; background: var(--paper); font-size: 14px; cursor: pointer; user-select: none; -webkit-user-select: none;
+  }
+  #criteriaForm label:has(> input[type="checkbox"]) > input[type="checkbox"] { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
+  #criteriaForm label:has(> input[type="checkbox"]:checked) { background: var(--accent); border-color: var(--accent); color: #fff; }
+  #criteriaForm label:has(> input[type="checkbox"]:checked) .tag.glossary { background: transparent; color: #fff; border-color: rgba(255,255,255,.6); }
+  #criteriaForm label:has(> input[type="checkbox"]:focus-visible) { outline: 2px solid var(--accent-line); outline-offset: 2px; }
+  .resultsBar { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin: 16px 0 10px; padding-top: 12px; border-top: 1px dashed var(--border); scroll-margin-top: 64px; }
+  .resultsBar.hidden { display: none; }
+  .resultsCount { font-weight: 700; color: var(--accent-dark); font-size: 15px; }
+  .resultsCount small { display: block; font-weight: 400; font-size: 12px; color: var(--ink-soft); }
+  .sortLabel { display: inline-flex !important; align-items: center; gap: 6px; margin: 0 !important; padding: 0 !important; font-size: 13px; color: var(--ink-soft); }
+  .sortLabel select { width: auto; margin: 0; padding: 6px 8px; font-size: 14px; }
+  .dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; padding: 10px max(12px, env(safe-area-inset-left, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(to top, var(--cream) 65%, rgba(255,255,255,0)); }
+  .dock.hidden { display: none; }
+  #tab-recommend { padding-bottom: 72px; }
+  .dock button { max-width: 876px; display: block; margin: 0 auto; }
+  .pcard { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 6px 12px; border-left-width: 1px; border-left-color: var(--border); }
+  .pcard.noimg { grid-template-columns: minmax(0, 1fr); }
+  .pcard .thumb { float: none; width: 76px; height: 110px; margin: 0; }
+  .pcard > *:not(.thumb):not(:nth-child(2)) { grid-column: 1 / -1; }
+  .pcard.noimg > * { grid-column: 1 / -1; }
+  .pcard h3 { margin: 0; font-size: 16px; line-height: 1.35; display: block; }
+  .pcPrice { font-size: 22px; font-weight: 800; color: var(--accent-dark); font-variant-numeric: tabular-nums; line-height: 1.25; margin-top: 2px; }
+  .pcPrice small { font-size: 12px; font-weight: 600; color: var(--ink-soft); margin-left: 4px; }
+  .pcard .meta { font-size: 12px; }
+  .match { display: inline-block; font-size: 11px; font-weight: 700; color: var(--accent-dark); background: var(--accent-soft); border-radius: 6px; padding: 1px 7px; margin: 3px 0 1px; }
+  .match.full { color: #1e5a2e; background: #e1f1e4; }
+  .pcTags { margin-top: 4px; }
+  .pcTags .tag { font-size: 11px; padding: 2px 8px; margin: 2px 3px 2px 0; }
+  .pcTags .tag.sv { background: #eef2f6; border-color: #d5dee8; color: #2c4a63; }
+  .pcard > .highlight { margin: 4px 0 0; font-size: 13.5px; }
+  .clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; }
+  /* 下の余白に4行目がのぞかないよう、余白は透明な枠線で作る（背景は枠線の下にも塗られる） */
+  .highlight.clamp { padding-bottom: 0; border-bottom: 8px solid transparent; }
+  .clampHint { font-size: 11px; color: var(--ink-soft); text-align: right; cursor: pointer; margin-top: -2px; }
+  .pcard > .code { font-size: 10px; margin-top: 2px; }
+  .pcard > .caution { font-size: 11px; padding: 4px 8px; margin-top: 0; }
+  .listTools { display: grid; gap: 6px; margin: 0 0 10px; }
+  .quickChips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .quickChips button { margin: 0; padding: 6px 12px; font-size: 13px; border-radius: 999px; border: 1px solid var(--border); background: var(--paper); color: var(--ink); }
+  .quickChips button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .listMeta { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--ink-soft); }
+
+  /* ワインだけの見た目：色の帯は残す・説明（接客トーク素材）は金色の枠 */
+  .pcard.wine-red, .pcard.wine-white, .pcard.wine-rose { border-left-width: 4px; }
+  .pcard h3 .swatch { margin-right: 6px; vertical-align: 1px; }
+  .highlight { color: var(--wine-dark); background: var(--gold-soft); padding: 8px 10px; border-radius: 8px; border-left: 3px solid var(--gold); }
+  .pcTags .tag.taste { background: #f6eef1; border-color: #e3cbd5; color: var(--wine-dark); }
+  .pcard > .reason { margin: 4px 0 0; font-size: 13px; }
+  /* 価格の自由入力欄がスマホ幅からはみ出していた（既存の不具合、2026-11 修正） */
+  #criteriaForm fieldset { min-width: 0; }
+  #priceMinInput, #priceMaxInput { min-width: 0; }
+
   @media (max-width: 480px) {
     body { padding: 10px 8px 28px; font-size: 15px; }
     label { display: block; }
@@ -208,15 +269,38 @@
       </label>
     </fieldset>
 
-    <button type="button" id="searchButton" class="primary">この条件で探す</button>
-    <button type="button" id="clearCriteriaButton" class="secondary" style="width:100%;margin-top:8px;">条件をクリア</button>
+    <button type="button" id="clearCriteriaButton" class="secondary" style="width:100%;margin-top:0;">条件をクリア</button>
   </form>
 
-  <div id="results"></div>
+  <div id="resultsBar" class="resultsBar hidden">
+    <div id="resultsCount" class="resultsCount"></div>
+    <label class="sortLabel">並べ替え
+      <select id="resultsSort">
+        <option value="score">一致度順</option>
+        <option value="priceAsc">価格の安い順</option>
+        <option value="priceDesc">価格の高い順</option>
+      </select>
+    </label>
+  </div>
+  <div id="results"><p class="muted">条件をタップすると、ここに結果が出ます。</p></div>
+  <div id="resultsDock" class="dock hidden"><button type="button" id="resultsDockButton" class="primary"></button></div>
 </section>
 
 <section id="tab-list" class="tabPanel">
   <input type="text" id="listSearch" placeholder="商品名・産地・品種で検索">
+  <div class="listTools">
+    <div id="listQuickChips" class="quickChips" role="group" aria-label="絞り込み"></div>
+    <div class="listMeta">
+      <span id="listCount"></span>
+      <label class="sortLabel">並べ替え
+        <select id="listSort">
+          <option value="score">登録順</option>
+          <option value="priceAsc">価格の安い順</option>
+          <option value="priceDesc">価格の高い順</option>
+        </select>
+      </label>
+    </div>
+  </div>
   <div id="listResults"></div>
 </section>
 
@@ -500,6 +584,26 @@ function rankProducts(products, criteria, topN) {
   const scored = active.map((p) => ({ product: p, ...scoreProduct(p, criteria) }));
   scored.sort((a, b) => b.score - a.score || b.matchedCount - a.matchedCount);
   return scored.slice(0, topN);
+}
+
+// 結果の並べ替え（3ツール共通。entries は rankProducts の戻り値、または { product } の配列）。
+// mode: 'score'（そのまま＝一致度順）/ 'priceAsc'（安い順）/ 'priceDesc'（高い順）。
+// 価格不明の商品は常に最後。同じ価格なら一致度の高い順、それも同じなら元の順番を保つ。
+function sortEntries(entries, mode) {
+  if (mode !== 'priceAsc' && mode !== 'priceDesc') return entries.slice();
+  const dir = mode === 'priceAsc' ? 1 : -1;
+  const hasPrice = (e) => e.product.price !== null && e.product.price !== undefined;
+  return entries
+    .map((e, i) => ({ e, i }))
+    .sort((a, b) => {
+      const pa = hasPrice(a.e), pb = hasPrice(b.e);
+      if (pa !== pb) return pa ? -1 : 1;
+      if (pa && a.e.product.price !== b.e.product.price) return (a.e.product.price - b.e.product.price) * dir;
+      const sa = a.e.score || 0, sb = b.e.score || 0;
+      if (sa !== sb) return sb - sa;
+      return a.i - b.i;
+    })
+    .map((x) => x.e);
 }
 
 
@@ -854,6 +958,7 @@ async function syncFromServer(passcode, silent, adminPasscode) {
     saveCache(PRODUCTS);
     updateSyncStatus();
     renderListResults();
+    runSearch();
     if (adminPasscode) {
       if (!data.discontinuedProducts) {
         return { ok: false, reason: 'admin_invalid' };
@@ -974,8 +1079,11 @@ function updateRegionField() {
     renderCheckboxGroup('regionFields', 'region', []);
     return;
   }
+  // 国を足し引きしても、選んでいた地方の選択は残す（タップで即結果になったため、消えると結果が急に変わる）
+  const keep = getCheckedValues('region');
   regionField.style.display = 'block';
   renderCheckboxGroup('regionFields', 'region', applicableRegions);
+  document.querySelectorAll('input[name="region"]').forEach((el) => { el.checked = keep.includes(el.value); });
 }
 
 function getCheckedValues(name) {
@@ -1048,33 +1156,13 @@ function buildReasonText(product, matchedPairingTags) {
 
 // 画像はアプリと同じ場所の img/ に置いたファイルを使う（外部サイトには接続しない）。
 // スプレッドシートの imageUrl 列には "img/xxxxxxxxxxxxxxxx.webp" の形式で入れる。読み込み失敗時は画像を消す。
-function thumbHtml(p) {
-  if (typeof p.imageUrl !== 'string' || !/^img\/[0-9a-f]{16}\.webp$/.test(p.imageUrl)) return '';
-  return `<img class="thumb" src="${p.imageUrl}" alt="" loading="lazy" onerror="this.remove()">`;
+function hasThumb(p) {
+  return typeof p.imageUrl === 'string' && /^img\/[0-9a-f]{16}\.webp$/.test(p.imageUrl);
 }
 
-function renderResultCard(entry) {
-  const p = entry.product;
-  // フリーワードだけで検索した場合は一致度を計算する条件がなく、全件「0%」と出て誤解を招くため表示しない（2026-10修正）
-  const scoreBadge = entry.totalCriteria > 0 ? `<span class="score">一致度 ${Math.round(entry.score * 100)}%</span>` : '';
-  const tasteLine = [...(p.sweetness || []), ...(p.body || [])].join(' / ');
-  const trivia = p.trivia ? `<div class="trivia">${escapeHtml(p.trivia)}</div>` : '';
-  const reason = buildReasonText(p, entry.breakdown && entry.breakdown.pairingTags);
-  return `
-    <div class="card ${cardClasses(p)}">
-      ${thumbHtml(p)}
-      <h3>${swatchesHtml(p)}${escapeHtml(p.name)}${scoreBadge}</h3>
-      ${metaLineHtml(p)}
-      ${veganTagHtml(p)}
-      <div class="meta">${escapeHtml(tasteLine)}</div>
-      <div>${(p.tasteTags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
-      <div>${(p.pairingTags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
-      ${reason}
-      ${trivia}
-      ${confidenceCaution(p, true)}
-      <div class="code" style="margin-top:6px;">コード: ${escapeHtml(p.code)}</div>
-    </div>
-  `;
+function thumbHtml(p) {
+  if (!hasThumb(p)) return '';
+  return `<img class="thumb" src="${p.imageUrl}" alt="" loading="lazy" onerror="var c=this.closest('.pcard');if(c)c.classList.add('noimg');this.remove()">`;
 }
 
 function parsePriceInput(id) {
@@ -1084,10 +1172,12 @@ function parsePriceInput(id) {
   return Number.isFinite(n) ? n : null;
 }
 
-document.getElementById('searchButton').addEventListener('click', () => {
+// ---------- ツールごとに違う部分（ワイン） ----------
+
+function currentCriteria() {
   const freeTextTags = resolvePairingText(document.getElementById('pairingFreeText').value);
   const pairingTags = Array.from(new Set([...getCheckedValues('pairing'), ...freeTextTags]));
-  const criteria = {
+  return {
     freeText: document.getElementById('recommendFreeText').value.trim(),
     priceBandIds: priceLabelsToBandIds(getCheckedValues('price')),
     priceMin: parsePriceInput('priceMinInput'),
@@ -1102,56 +1192,221 @@ document.getElementById('searchButton').addEventListener('click', () => {
     body: getCheckedValues('body'),
     tasteTags: getCheckedValues('tasteTag'),
     pairingTags,
+    // 料理の自由入力が辞書に当たらなかったときも「条件あり」と数えるため
+    pairingFreeText: document.getElementById('pairingFreeText').value.trim(),
   };
-  const ranked = rankProducts(PRODUCTS, criteria, 20);
-  document.getElementById('results').innerHTML = ranked.length > 0
-    ? ranked.map(renderResultCard).join('')
-    : '<p class="muted">条件に合う商品が見つかりませんでした。条件を減らしてお試しください。</p>';
-});
+}
 
-document.getElementById('clearCriteriaButton').addEventListener('click', () => {
-  document.getElementById('criteriaForm').querySelectorAll('input[type="checkbox"]').forEach((el) => { el.checked = false; });
-  document.getElementById('pairingFreeText').value = '';
-  document.getElementById('recommendFreeText').value = '';
-  document.getElementById('priceMinInput').value = '';
-  document.getElementById('priceMaxInput').value = '';
-  updateRegionField();
-  document.getElementById('results').innerHTML = '';
-});
+// ワインの scoring.js には hasAnyCriteria がないので、画面側で判定する
+function hasAnyCriteria(c) {
+  return !!(c.freeText || c.pairingFreeText || c.priceBandIds.length || c.priceMin !== null || c.priceMax !== null
+    || c.colors.length || c.sparklingOnly || c.veganOnly || c.countries.length || c.regions.length
+    || c.varieties.length || c.sweetness.length || c.body.length || c.tasteTags.length || c.pairingTags.length);
+}
 
-// ---------- 一覧タブ ----------
+function cardSpecText(p) { return p.size || ''; }
 
-function renderListCard(p) {
+function cardOriginText(p) {
+  const color = colorMetaText(p);
+  const origin = (p.country || '産地不明') + (p.region ? '（' + p.region + '）' : '');
+  return (color ? color + ' ／ ' : '') + origin;
+}
+
+function cardTagsHtml(p) {
+  const tag = (t, cls) => `<span class="tag${cls ? ' ' + cls : ''}">${escapeHtml(t)}</span>`;
+  return veganTagHtml(p)
+    + [...(p.sweetness || []), ...(p.body || [])].map((t) => tag(t, 'taste')).join('')
+    + (p.tasteTags || []).map((t) => tag(t)).join('')
+    + (p.pairingTags || []).map((t) => tag(t, 'sv')).join('');
+}
+
+function cardHighlightText(p) { return p.trivia || ''; }
+function cardTitlePrefixHtml(p) { return swatchesHtml(p); }
+function cardExtraClass(p) { return cardClasses(p); }
+function cardReasonHtml(entry) { return buildReasonText(entry.product, entry.breakdown && entry.breakdown.pairingTags); }
+
+// 一覧タブ：国名そのものを入力したときは国で絞る（「チリ」で産地「シチリア」が出ないように）
+function listTextFilter(products, q) {
+  if (!q) return products;
+  if (products.some((p) => p.country === q)) return products.filter((p) => p.country === q);
+  return products.filter((p) => matchesFreeText(p, q));
+}
+const LIST_QUICK_VALUES = [...COLORS, 'スパークリング'];
+function listQuickMatch(p, value) { return value === 'スパークリング' ? isTrue(p.sparkling) : p.color === value; }
+
+// ---------- 3ツール共通：商品カード ----------
+
+// ツールごとの部分（cardSpecText / cardOriginText / cardTagsHtml / cardHighlightText /
+// cardTitlePrefixHtml / cardExtraClass / cardReasonHtml）は「ツールごとに違う部分」で定義する。
+function productCardHtml(p, opts) {
+  const o = opts || {};
+  const price = p.price === null || p.price === undefined ? '価格不明' : p.price.toLocaleString() + '円';
+  const spec = cardSpecText(p);
+  const hlText = cardHighlightText(p);
+  const highlight = o.highlight && hlText
+    ? `<div class="highlight clamp" data-clamp>${escapeHtml(hlText)}</div><div class="clampHint" data-clamp>タップで全文 ▼</div>` : '';
+  const extraClass = cardExtraClass(p);
   return `
-    <div class="card ${cardClasses(p)}" data-code="${escapeHtml(p.code)}">
+    <div class="card pcard${hasThumb(p) ? '' : ' noimg'}${extraClass ? ' ' + extraClass : ''}" data-code="${escapeHtml(p.code)}">
       ${thumbHtml(p)}
-      <h3>${swatchesHtml(p)}${escapeHtml(p.name)}</h3>
-      ${metaLineHtml(p)}
-      ${veganTagHtml(p)}
-      <div>${(p.varieties || []).map((v) => `<span class="tag">${escapeHtml(v)}</span>`).join('')}</div>
-      <div class="code" style="margin-top:6px;">コード: ${escapeHtml(p.code)}</div>
+      <div>
+        <h3>${cardTitlePrefixHtml(p)}${escapeHtml(p.name)}</h3>
+        <div class="pcPrice">${price}${spec ? `<small>${escapeHtml(spec)}</small>` : ''}</div>
+        <div class="meta">${escapeHtml(cardOriginText(p))}</div>
+        ${o.badge || ''}
+        <div class="pcTags">${cardTagsHtml(p)}</div>
+      </div>
+      ${o.extra || ''}
+      ${highlight}
+      ${o.highlight ? confidenceCaution(p) : ''}
+      <div class="code">コード: ${escapeHtml(p.code)}</div>
     </div>
   `;
 }
 
+// 説明文は3行までに縮め、タップで全文を開閉する
+document.body.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-clamp]');
+  if (!el) return;
+  const card = el.closest('.pcard');
+  const text = card.querySelector('.highlight');
+  const hint = card.querySelector('.clampHint');
+  const open = text.classList.toggle('clamp') === false;
+  hint.textContent = open ? '閉じる ▲' : 'タップで全文 ▼';
+});
+
+// ---------- 3ツール共通：レコメンド（タップで即結果＋下の「結果を見る」ボタン） ----------
+
+function renderResultCard(entry) {
+  // フリーワードだけで検索した場合は一致度を計算する条件がなく、全件「0%」と出て誤解を招くため表示しない（2026-10修正）
+  let badge = '';
+  if (entry.totalCriteria > 0) {
+    badge = entry.score === 1
+      ? '<span class="match full">条件に全部一致</span>'
+      : `<span class="match">一致度 ${Math.round(entry.score * 100)}%</span>`;
+  }
+  return productCardHtml(entry.product, { badge, highlight: true, extra: cardReasonHtml(entry) });
+}
+
+let lastResults = { has: false, withCriteria: false, fullCount: 0, shown: 0 };
+
+function runSearch() {
+  const criteria = currentCriteria();
+  const resultsEl = document.getElementById('results');
+  const bar = document.getElementById('resultsBar');
+  if (!hasAnyCriteria(criteria)) {
+    lastResults = { has: false, withCriteria: false, fullCount: 0, shown: 0 };
+    bar.classList.add('hidden');
+    resultsEl.innerHTML = '<p class="muted">条件をタップすると、ここに結果が出ます。</p>';
+    updateDock();
+    return;
+  }
+  const all = rankProducts(PRODUCTS, criteria, Infinity);
+  const withCriteria = all.length > 0 && all[0].totalCriteria > 0;
+  // 条件が1つも合わない商品（一致度0%）は出さない。フリーワードだけのときは全件が「一致」
+  const hits = withCriteria ? all.filter((e) => e.score > 0) : all;
+  const fullCount = withCriteria ? hits.filter((e) => e.score === 1).length : hits.length;
+  const top = sortEntries(hits.slice(0, 20), document.getElementById('resultsSort').value);
+  lastResults = { has: true, withCriteria, fullCount, shown: top.length };
+
+  let countHtml;
+  if (withCriteria) {
+    countHtml = `▼ 条件に全部合う ${fullCount}件`
+      + (top.length > fullCount ? `<small>一部だけ合うものを含め、一致度の高い${top.length}件を表示</small>` : '');
+  } else {
+    countHtml = `▼ ${hits.length}件` + (hits.length > top.length ? `<small>上位${top.length}件を表示</small>` : '');
+  }
+  document.getElementById('resultsCount').innerHTML = countHtml;
+  bar.classList.remove('hidden');
+  resultsEl.innerHTML = top.length > 0
+    ? top.map(renderResultCard).join('')
+    : '<p class="muted">条件に合う商品が見つかりませんでした。条件を減らしてお試しください。</p>';
+  updateDock();
+}
+
+// 結果が画面に見えていない間だけ、下に「結果を見る」ボタンを出す
+let resultsVisible = false;
+function updateDock() {
+  const dock = document.getElementById('resultsDock');
+  const onRecommend = document.getElementById('tab-recommend').classList.contains('active');
+  if (!lastResults.has || resultsVisible || !onRecommend) { dock.classList.add('hidden'); return; }
+  let label;
+  if (!lastResults.withCriteria) label = `結果を見る ↓（${lastResults.fullCount}件）`;
+  else if (lastResults.fullCount > 0) label = `結果を見る ↓（全部合う ${lastResults.fullCount}件）`;
+  else label = `結果を見る ↓（一部だけ合う ${lastResults.shown}件）`;
+  document.getElementById('resultsDockButton').textContent = label;
+  dock.classList.remove('hidden');
+}
+
+if ('IntersectionObserver' in window) {
+  const seen = new Map();
+  const io = new IntersectionObserver((items) => {
+    items.forEach((it) => seen.set(it.target.id, it.isIntersecting));
+    resultsVisible = Array.from(seen.values()).some(Boolean);
+    updateDock();
+  });
+  io.observe(document.getElementById('resultsBar'));
+  io.observe(document.getElementById('results'));
+}
+
+document.getElementById('resultsDockButton').addEventListener('click', () => {
+  document.getElementById('resultsBar').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+document.getElementById('criteriaForm').addEventListener('change', runSearch);
+let freeTextTimer = null;
+document.getElementById('criteriaForm').addEventListener('input', (e) => {
+  if (e.target.type !== 'text' && e.target.type !== 'number') return;
+  clearTimeout(freeTextTimer);
+  freeTextTimer = setTimeout(runSearch, 300);
+});
+document.getElementById('criteriaForm').addEventListener('submit', (e) => e.preventDefault());
+document.getElementById('resultsSort').addEventListener('change', runSearch);
+
+document.getElementById('clearCriteriaButton').addEventListener('click', () => {
+  document.getElementById('criteriaForm').querySelectorAll('input[type="checkbox"]').forEach((el) => { el.checked = false; });
+  document.getElementById('criteriaForm').querySelectorAll('input[type="text"], input[type="number"]').forEach((el) => { el.value = ''; });
+  document.getElementById('resultsSort').value = 'score';
+  if (typeof updateRegionField === 'function') updateRegionField();
+  runSearch();
+});
+
+// ---------- 3ツール共通：一覧タブ（検索・かんたん絞り込み・並べ替え・件数） ----------
+
+let listQuick = '';
+
+function renderListQuickChips() {
+  document.getElementById('listQuickChips').innerHTML = ['', ...LIST_QUICK_VALUES].map((v) =>
+    `<button type="button" data-quick="${escapeHtml(v)}" aria-pressed="${v === listQuick}">${v ? escapeHtml(v) : 'すべて'}</button>`).join('');
+}
+
+document.getElementById('listQuickChips').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-quick]');
+  if (!btn) return;
+  listQuick = btn.getAttribute('data-quick');
+  renderListQuickChips();
+  renderListResults();
+});
+
 function renderListResults() {
   const q = (document.getElementById('listSearch').value || '').trim();
   const active = PRODUCTS.filter((p) => p.status !== 'discontinued');
-  // 国名そのものを入力したときは国で絞る（「チリ」で産地「シチリア」が出ないように）
-  const isCountry = active.some((p) => p.country === q);
-  const filtered = !q
-    ? active
-    : isCountry
-      ? active.filter((p) => p.country === q)
-      : active.filter((p) => [p.name, p.country, p.region, ...(p.varieties || [])].filter(Boolean).some((v) => v.includes(q)));
-  const container = document.getElementById('listResults');
-  container.innerHTML = filtered.map(renderListCard).join('');
-  container.querySelectorAll('.card').forEach((card) => {
-    card.addEventListener('click', () => openDetail(card.getAttribute('data-code')));
-  });
+  const filtered = listTextFilter(active, q).filter((p) => !listQuick || listQuickMatch(p, listQuick));
+  const sorted = sortEntries(filtered.map((p) => ({ product: p })), document.getElementById('listSort').value);
+  document.getElementById('listCount').textContent = `${sorted.length}件`;
+  document.getElementById('listResults').innerHTML = sorted.length
+    ? sorted.map((e) => productCardHtml(e.product)).join('')
+    : '<p class="muted">該当する商品がありません。</p>';
 }
 
+document.getElementById('listResults').addEventListener('click', (e) => {
+  if (e.target.closest('.tag')) return; // タグクリックは用語集を優先
+  const card = e.target.closest('.pcard');
+  if (card) openDetail(card.getAttribute('data-code'));
+});
+
 document.getElementById('listSearch').addEventListener('input', renderListResults);
+document.getElementById('listSort').addEventListener('change', renderListResults);
 
 // ---------- 詳細オーバーレイ ----------
 
@@ -1454,6 +1709,7 @@ document.querySelectorAll('.tabBtn').forEach((btn) => {
     document.querySelectorAll('.tabPanel').forEach((p) => p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('tab-' + btn.getAttribute('data-tab')).classList.add('active');
+    updateDock();
   });
 });
 
@@ -1462,7 +1718,9 @@ document.querySelectorAll('.tabBtn').forEach((btn) => {
 function startApp() {
   initForm();
   updateRegionField();
+  renderListQuickChips();
   renderListResults();
+  runSearch();
   renderLearn();
   updateSyncStatus();
   populateAdminSelects();
