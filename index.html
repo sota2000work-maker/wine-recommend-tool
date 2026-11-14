@@ -91,6 +91,7 @@
   }
   .code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; color: var(--ink-soft); letter-spacing: .02em; }
   .caution { color: #8a3b1c; font-size: 12px; background: #fbeee5; padding: 6px 8px; border-radius: 6px; margin-top: 6px; }
+  .tag.glossary { border-color: var(--gold); cursor: pointer; }
   .tag.vegan { background: #e6f2e1; border-color: #9cc48a; color: #2f5a1f; font-weight: 600; }
   .muted { color: var(--ink-soft); font-size: 13px; }
   .syncBar { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--ink-soft); margin-bottom: 6px; }
@@ -237,9 +238,9 @@
 
     <fieldset>
       <legend>味わい</legend>
-      <div><b>甘辛度</b><div id="sweetnessFields"></div></div>
-      <div><b>ボディ</b><div id="bodyFields"></div></div>
-      <div><b>テイスト</b><div id="tasteTagFields"></div></div>
+      <div><b>甘辛度</b> <span class="tag glossary" data-term="甘辛度" style="padding:1px 6px;">ⓘ</span><div id="sweetnessFields"></div></div>
+      <div><b>ボディ</b> <span class="tag glossary" data-term="ボディ" style="padding:1px 6px;">ⓘ</span><div id="bodyFields"></div></div>
+      <div><b>テイスト</b> <span class="muted">（ⓘ をタップすると説明が見られます）</span><div id="tasteTagFields"></div></div>
     </fieldset>
 
     <fieldset>
@@ -380,6 +381,13 @@
     </fieldset>
   </div>
 </section>
+
+<div id="glossaryOverlay" class="overlay hidden">
+  <div class="sheet">
+    <div id="glossaryContent"></div>
+    <button type="button" id="glossaryCloseButton" class="secondary closeBtn">閉じる</button>
+  </div>
+</div>
 
 <div id="detailOverlay" class="overlay hidden">
   <div class="sheet">
@@ -894,6 +902,18 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyayRiyGuhpOexp
 const STORAGE_KEY = 'wineToolCache_v1';
 const STAFF_PASSCODE_KEY = 'wineToolStaffPasscode_v1';
 
+// 味わいタグの用語集（ウイスキー・焼酎ツールと同じく、タグの ⓘ をタップすると説明が開く。2026-11-14 追加）
+const TASTE_GLOSSARY = {
+  'フルーティ': 'ブドウや発酵から生まれる果実の香り・味わい。白ワインはりんご・柑橘・桃、赤ワインはいちご・チェリー・カシスなどに例えられます。若いワインや温暖な産地のものに出やすいです。',
+  '酸味が爽やか': 'キリッとした酸が、フレッシュさとキレを感じさせるタイプ。冷涼な産地のワインや、ソーヴィニヨン・ブラン、リースリング、甲州などに多いです。揚げ物や魚介と合わせやすいです。',
+  'スパイシー': '黒こしょう・クローブ・シナモンのようなスパイスの香り。シラー（シラーズ）などの品種や、樽熟成から生まれることが多いです。',
+  'ミネラル感': '石や火打ち石、ほのかな塩気を思わせる、引き締まった風味を表す言葉。シャブリや甲州などの辛口の白ワインでよく使われます。',
+  'なめらか（タンニン控えめ）': '渋み（タンニン）が穏やかで、口当たりがやわらかいタイプ。ピノ・ノワールやガメイなどに多く、赤ワインの渋みが苦手な方にも勧めやすいです。',
+  'しっかりタンニン': '渋み（タンニン）がしっかり感じられる赤ワイン。カベルネ・ソーヴィニヨンやネッビオーロなどに多く、肉の脂と合わせると渋みがやわらいで感じられます。',
+};
+// 見出し（甘辛度・ボディ）の ⓘ 用。本文は「学ぶ」タブの同じ用語から引く
+const SCALE_GLOSSARY_TERMS = { '甘辛度': '甘辛度（辛口〜甘口）', 'ボディ': 'ボディ' };
+
 let PRODUCTS = [];
 // 管理パスコードで認証できた場合にのみ入る、取扱終了品の配列（PRODUCTSには混ぜない）
 let ADMIN_DISCONTINUED = [];
@@ -1042,11 +1062,53 @@ async function initAuth() {
 
 // ---------- レコメンドタブ ----------
 
-function renderCheckboxGroup(containerId, name, values) {
+// ---------- 用語集ポップアップ ----------
+
+function glossaryText(term) {
+  if (TASTE_GLOSSARY[term]) return TASTE_GLOSSARY[term];
+  const learnTerm = SCALE_GLOSSARY_TERMS[term];
+  if (!learnTerm) return null;
+  const item = LEARN_SECTIONS.flatMap((s) => s.items).find((i) => i.term === learnTerm);
+  return item ? item.body : null;
+}
+
+function openGlossary(term) {
+  const def = glossaryText(term);
+  if (!def) return;
+  document.getElementById('glossaryContent').innerHTML = `<h2>${escapeHtml(term)}</h2><p>${escapeHtml(def)}</p>`;
+  document.getElementById('glossaryOverlay').classList.remove('hidden');
+}
+
+document.getElementById('glossaryCloseButton').addEventListener('click', () => {
+  document.getElementById('glossaryOverlay').classList.add('hidden');
+});
+
+function glossaryTagHtml(term, extraClass) {
+  const has = !!TASTE_GLOSSARY[term];
+  const cls = 'tag' + (has ? ' glossary' : '') + (extraClass ? ' ' + extraClass : '');
+  const safeTerm = escapeHtml(term);
+  return `<span class="${cls}" data-term="${safeTerm}">${safeTerm}${has ? ' ⓘ' : ''}</span>`;
+}
+
+// タグクリックで用語集を開く（イベント委譲。結果カード・一覧・詳細・フォームに対応）
+document.body.addEventListener('click', (e) => {
+  const tagEl = e.target.closest('.tag.glossary');
+  if (tagEl) {
+    // 条件ボタンの中の ⓘ を押したときは、説明だけ開いて選択は切り替えない
+    if (tagEl.closest('label')) e.preventDefault();
+    openGlossary(tagEl.getAttribute('data-term'));
+  }
+});
+
+// ---------- レコメンドタブ ----------
+
+function renderCheckboxGroup(containerId, name, values, withGlossary) {
   const container = document.getElementById(containerId);
-  container.innerHTML = values.map((v) =>
-    `<label><input type="checkbox" name="${name}" value="${v}">${v}</label>`
-  ).join('');
+  container.innerHTML = values.map((v) => {
+    const info = withGlossary && TASTE_GLOSSARY[v]
+      ? ` <span class="tag glossary" data-term="${v}" style="padding:1px 6px;">ⓘ</span>` : '';
+    return `<label><input type="checkbox" name="${name}" value="${v}">${v}${info}</label>`;
+  }).join('');
 }
 
 function renderSelectOptions(selectId, values, placeholder) {
@@ -1059,7 +1121,7 @@ function initForm() {
   renderCheckboxGroup('pairingFields', 'pairing', PAIRING_TAGS);
   renderCheckboxGroup('sweetnessFields', 'sweetness', SWEETNESS_LEVELS);
   renderCheckboxGroup('bodyFields', 'body', BODY_LEVELS);
-  renderCheckboxGroup('tasteTagFields', 'tasteTag', TASTE_TAGS);
+  renderCheckboxGroup('tasteTagFields', 'tasteTag', TASTE_TAGS, true);
   renderCheckboxGroup('colorFields', 'color', COLORS);
   renderCheckboxGroup('countryFields', 'country', COUNTRIES);
   renderCheckboxGroup('priceFields', 'price', PRICE_BANDS.map((b) => b.label));
@@ -1216,7 +1278,7 @@ function cardTagsHtml(p) {
   const tag = (t, cls) => `<span class="tag${cls ? ' ' + cls : ''}">${escapeHtml(t)}</span>`;
   return veganTagHtml(p)
     + [...(p.sweetness || []), ...(p.body || [])].map((t) => tag(t, 'taste')).join('')
-    + (p.tasteTags || []).map((t) => tag(t)).join('')
+    + (p.tasteTags || []).map((t) => glossaryTagHtml(t)).join('')
     + (p.pairingTags || []).map((t) => tag(t, 'sv')).join('');
 }
 
@@ -1424,7 +1486,7 @@ function openDetail(code) {
     ${isTrue(p.vegan) ? `<div>${veganTagHtml(p)}<span class="muted">根拠: ${escapeHtml(p.veganSource) || '未記入'}</span></div>` : ''}
     <div>${(p.varieties || []).map((v) => `<span class="tag">${escapeHtml(v)}</span>`).join('')}</div>
     <p class="meta">${escapeHtml(tasteLine)}</p>
-    <div>${(p.tasteTags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
+    <div>${(p.tasteTags || []).map((t) => glossaryTagHtml(t)).join('')}</div>
     <h3>ペアリング</h3>
     <div>${(p.pairingTags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
     ${pairingReasonLines}
@@ -1597,7 +1659,7 @@ const LEARN_SECTIONS = [
     items: [
       {
         term: 'ボディ',
-        body: '口に含んだときの重さ・飲みごたえのこと。「軽め」はさらっと軽快、「重め」は濃厚でしっかりした飲み応え。一般に、アルコール度数や渋み・凝縮感が強いほどボディは重くなる傾向がある。',
+        body: '口に含んだときの重さ・飲みごたえのこと。「軽め」はさらっと軽快、「重め」は濃厚でしっかりした飲み応え（一般には「ライトボディ」「ミディアムボディ」「フルボディ」とも言う）。赤ワインでよく使われる言葉だが、白・ロゼ・スパークリングにも使う（例：樽熟成のシャルドネは白でも重め）。一般に、アルコール度数や渋み・凝縮感が強いほどボディは重くなる傾向がある。',
         talk: '軽めのものは食事に合わせやすく、重めのものはお肉料理やゆっくり飲みたいときにおすすめです。',
       },
       {
@@ -1642,6 +1704,7 @@ const LEARN_SECTIONS = [
       },
     ],
   },
+  { title: '味わいタグ', items: Object.entries(TASTE_GLOSSARY).map(([term, body]) => ({ term, body })) },
 ];
 
 function glossaryItems(glossary) {

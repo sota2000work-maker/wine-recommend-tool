@@ -2,7 +2,7 @@
 // アプリ本体（HTML/アイコン等）をキャッシュし、オフラインでも起動できるようにする。
 // Apps Script への同期リクエスト（他オリジン）はキャッシュ対象外で、通常通りネットワークに任せる。
 
-const CACHE_NAME = 'wine-tool-v51ddb8dcb7';
+const CACHE_NAME = 'wine-tool-vb2d980fe52';
 const APP_SHELL = [
   './',
   './index.html',
