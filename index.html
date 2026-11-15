@@ -177,7 +177,7 @@
   .quickChips button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
   .listMeta { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--ink-soft); }
 
-  /* ワインだけの見た目：色の帯は残す・説明（接客トーク素材）は金色の枠 */
+  /* ワインだけの見た目：色の帯は残す・説明（商品情報）は金色の枠 */
   .pcard.wine-red, .pcard.wine-white, .pcard.wine-rose { border-left-width: 4px; }
   .pcard h3 .swatch { margin-right: 6px; vertical-align: 1px; }
   .highlight { color: var(--wine-dark); background: var(--gold-soft); padding: 8px 10px; border-radius: 8px; border-left: 3px solid var(--gold); }
@@ -354,7 +354,7 @@
       <div><b>ボディ（複数選択可）</b><div id="admBodyFields"></div></div>
       <label>テイストタグ（カンマ区切り・任意）<input type="text" id="admTasteTags"></label>
       <label>ペアリングタグ（カンマ区切り・任意）<input type="text" id="admPairingTags"></label>
-      <label>接客トーク素材（豆知識・任意）<input type="text" id="admTrivia"></label>
+      <label>商品情報（豆知識・任意）<input type="text" id="admTrivia"></label>
       <button type="button" id="admAddButton" class="primary">この内容で追加</button>
     </fieldset>
 
@@ -1527,7 +1527,7 @@ function openDetail(code) {
     <h3>ペアリング</h3>
     <div>${(p.pairingTags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
     ${pairingReasonLines}
-    ${p.trivia ? `<h3>接客トーク素材</h3><div class="trivia">${escapeHtml(p.trivia)}</div>` : ''}
+    ${p.trivia ? `<h3>商品情報</h3><div class="trivia">${escapeHtml(p.trivia)}</div>` : ''}
     ${p.status === 'discontinued' ? '<div class="caution">現在は取扱終了商品です</div>' : ''}
     ${confidenceCaution(p, false)}
     <div class="code" style="margin-top:8px;">商品コード: ${escapeHtml(p.code)}</div>
