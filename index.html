@@ -336,7 +336,7 @@
   <div id="adminBody">
     <div id="adminMsg"></div>
 
-    <fieldset>
+    <fieldset id="admAddFieldset">
       <legend>新商品を追加</legend>
       <label>商品名<input type="text" id="admName"></label>
       <label>生産者<input type="text" id="admProducer"></label>
@@ -1599,18 +1599,38 @@ document.getElementById('adminUnlockButton').addEventListener('click', async () 
   document.getElementById('adminBody').style.display = 'block';
 });
 
-function populateAdminSelects() {
+// 確認欄に名前を出した商品だけを削除する（確認欄を出した後にプルダウンを変えても、別の商品は消えない）
+let pendingDeleteCode = null;
+
+// 追加フォームの選択肢は起動時に1回だけ作る（同期のたびに作り直すと、入力途中の色やチェックが消えるため）
+function initAdminForm() {
   renderSelectOptions('admColor', COLORS);
   renderCheckboxGroup('admSweetnessFields', 'admSweetness', SWEETNESS_LEVELS);
   renderCheckboxGroup('admBodyFields', 'admBody', BODY_LEVELS);
+}
+
+function formatAdminPrice(price) {
+  return price === null || price === undefined ? '価格未設定' : `${Number(price).toLocaleString()}円`;
+}
+
+// 対象商品のプルダウンを作り直す。先頭は「選んでください」にして、選んでいた商品が残っていればそのまま保つ。
+// （操作のたびに先頭の商品へ戻ると、選び直しを忘れたときに別の商品を変更してしまうため）
+function fillAdminTargetSelect(id, products, withPrice) {
+  const select = document.getElementById(id);
+  const selected = select.value;
+  select.innerHTML = '<option value="">（商品を選んでください）</option>' + products.map((p) =>
+    `<option value="${escapeHtml(p.code)}">${escapeHtml(p.name)}${withPrice ? '（' + formatAdminPrice(p.price) + '）' : ''}</option>`).join('');
+  select.value = products.some((p) => p.code === selected) ? selected : '';
+}
+
+function populateAdminSelects() {
   const active = PRODUCTS; // サーバー側で既に取扱中のみに絞り込まれている
   const discontinued = ADMIN_DISCONTINUED; // 管理パスコードで認証済みの場合のみ入っている
-  const activeOptions = active.map((p) => `<option value="${escapeHtml(p.code)}">${escapeHtml(p.name)}</option>`).join('');
-  const discontinuedOptions = discontinued.map((p) => `<option value="${escapeHtml(p.code)}">${escapeHtml(p.name)}</option>`).join('');
-  document.getElementById('admPriceTarget').innerHTML = activeOptions;
-  document.getElementById('admDiscontinueTarget').innerHTML = activeOptions;
-  document.getElementById('admReactivateTarget').innerHTML = discontinuedOptions;
-  document.getElementById('admDeleteTarget').innerHTML = discontinuedOptions;
+  fillAdminTargetSelect('admPriceTarget', active, true);
+  fillAdminTargetSelect('admDiscontinueTarget', active, false);
+  fillAdminTargetSelect('admReactivateTarget', discontinued, false);
+  fillAdminTargetSelect('admDeleteTarget', discontinued, false);
+  pendingDeleteCode = null;
   document.getElementById('admDeleteConfirm').classList.add('hidden');
 }
 
@@ -1619,11 +1639,17 @@ function showAdminMsg(text, ok) {
   el.innerHTML = `<div class="msg ${ok ? 'ok' : 'err'}">${text}</div>`;
 }
 
+// 通信中は次の操作を受け付けない（ボタンの2度押しで同じ商品が2行登録されるのを防ぐ）
+let adminBusy = false;
+
 async function callAppsScript(payload) {
   if (!APPS_SCRIPT_URL) {
     showAdminMsg('Apps ScriptのURLが未設定です。READMEを参照して設定してください。', false);
     return false;
   }
+  if (adminBusy) return false;
+  adminBusy = true;
+  showAdminMsg('送信中です…', true);
   try {
     const res = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
@@ -1644,6 +1670,8 @@ async function callAppsScript(payload) {
   } catch (e) {
     showAdminMsg('通信エラーが発生しました。通信環境をご確認ください。', false);
     return false;
+  } finally {
+    adminBusy = false;
   }
 }
 
@@ -1682,33 +1710,45 @@ document.getElementById('admAddButton').addEventListener('click', async () => {
     status: 'active',
   };
   const success = await callAppsScript({ action: 'add', product });
-  if (success) showAdminMsg('「' + name + '」を追加しました', true);
+  if (success) {
+    showAdminMsg('「' + escapeHtml(name) + '」を追加しました', true);
+    // 入力欄を空に戻す（残ったままもう一度押すと、同じ商品が2行登録されるため）
+    const fieldset = document.getElementById('admAddFieldset');
+    fieldset.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach((el) => { el.value = ''; });
+    fieldset.querySelectorAll('input[type="checkbox"]').forEach((el) => { el.checked = false; });
+    fieldset.querySelectorAll('select').forEach((el) => { el.selectedIndex = 0; });
+  }
 });
 
 document.getElementById('admPriceButton').addEventListener('click', async () => {
   const code = document.getElementById('admPriceTarget').value;
   const newPrice = parsePriceInput('admNewPrice');
   if (!code || newPrice === null) { showAdminMsg('対象商品と新価格を指定してください', false); return; }
+  const product = PRODUCTS.find((p) => p.code === code);
   const success = await callAppsScript({ action: 'update', code, patch: { price: newPrice } });
-  if (success) showAdminMsg('価格を更新しました', true);
+  if (success) {
+    const label = product ? `「${escapeHtml(product.name)}」の価格を ${formatAdminPrice(product.price)} → ` : '価格を ';
+    showAdminMsg(`${label}${formatAdminPrice(newPrice)} に更新しました`, true);
+    document.getElementById('admNewPrice').value = '';
+    document.getElementById('admPriceTarget').value = '';
+  }
 });
 
 document.getElementById('admDiscontinueButton').addEventListener('click', async () => {
   const code = document.getElementById('admDiscontinueTarget').value;
   if (!code) { showAdminMsg('対象商品を選択してください', false); return; }
+  const product = PRODUCTS.find((p) => p.code === code);
   const success = await callAppsScript({ action: 'setStatus', code, status: 'discontinued' });
-  if (success) showAdminMsg('取扱終了にしました', true);
+  if (success) showAdminMsg((product ? '「' + escapeHtml(product.name) + '」を' : '') + '取扱終了にしました', true);
 });
 
 document.getElementById('admReactivateButton').addEventListener('click', async () => {
   const code = document.getElementById('admReactivateTarget').value;
   if (!code) { showAdminMsg('対象商品を選択してください', false); return; }
+  const product = ADMIN_DISCONTINUED.find((p) => p.code === code);
   const success = await callAppsScript({ action: 'setStatus', code, status: 'active' });
-  if (success) showAdminMsg('取扱を再開しました', true);
+  if (success) showAdminMsg((product ? '「' + escapeHtml(product.name) + '」の' : '') + '取扱を再開しました', true);
 });
-
-// 確認欄に名前を出した商品だけを削除する（確認欄を出した後にプルダウンを変えても、別の商品は消えない）
-let pendingDeleteCode = null;
 
 document.getElementById('admDeleteTarget').addEventListener('change', () => {
   pendingDeleteCode = null;
@@ -1948,6 +1988,7 @@ function startApp() {
   runSearch();
   renderLearn();
   updateSyncStatus();
+  initAdminForm();
   populateAdminSelects();
 }
 
