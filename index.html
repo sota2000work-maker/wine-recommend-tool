@@ -247,6 +247,7 @@
       <label style="display:block;">自由入力（例：ローストビーフ、刺身 など）
         <input type="text" id="pairingFreeText" placeholder="料理名を入力">
       </label>
+      <div id="pairingFreeTextNote" class="caution hidden">この料理名は分類できませんでした。上の料理ボタンから近いものを選んでください。</div>
     </fieldset>
 
     <fieldset>
@@ -462,6 +463,11 @@ const PAIRING_KEYWORD_DICTIONARY = {
   '豚肉': '豚肉・鶏肉', '唐揚げ': '豚肉・鶏肉', '鶏肉': '豚肉・鶏肉', 'チキン': '豚肉・鶏肉', '生姜焼き': '豚肉・鶏肉',
   'カルパッチョ': '魚介・カルパッチョ', '白身魚': '魚介・カルパッチョ', 'エビ': '魚介・カルパッチョ', '貝': '魚介・カルパッチョ',
   '刺身': '寿司・刺身', '寿司': '寿司・刺身', 'すし': '寿司・刺身',
+  // 同じ料理・食材の書き方違い（2026-11 追加。新しい料理の割り当ては増やしていない）
+  'さしみ': '寿司・刺身', '鮨': '寿司・刺身',
+  '唐揚': '豚肉・鶏肉', 'から揚げ': '豚肉・鶏肉', 'からあげ': '豚肉・鶏肉',
+  'えび': '魚介・カルパッチョ', '海老': '魚介・カルパッチョ',
+  'チョコ': 'デザート・甘味', 'フルーツ': 'デザート・甘味',
   'チーズ': 'チーズ',
   'パスタ': 'パスタ・トマト系', 'ピザ': 'パスタ・トマト系', 'トマト': 'パスタ・トマト系',
   '天ぷら': '和食全般', '煮物': '和食全般', '焼き魚': '和食全般', '和食': '和食全般', 'すき焼き': '和食全般',
@@ -485,6 +491,14 @@ function resolvePairingText(text) {
     }
   });
   return Array.from(tags);
+}
+
+// 国の条件。「その他」は、名前で選べる国（COUNTRIES の「その他」以外）に入らない商品すべてに当てる
+// （モルドバ・ジョージアなど。国が空欄の商品も含む）。以前は country が文字どおり「その他」の商品だけが
+// 対象で、該当0件だった（2026-11修正）。
+function countryMatches(product, selected) {
+  if (product.country != null && selected.includes(product.country)) return true;
+  return selected.includes('その他') && !COUNTRIES.includes(product.country);
 }
 
 function scoreProduct(product, criteria) {
@@ -529,7 +543,7 @@ function scoreProduct(product, criteria) {
 
   if (criteria.countries && criteria.countries.length > 0) {
     totalCriteria++;
-    const matched = product.country != null && criteria.countries.includes(product.country);
+    const matched = countryMatches(product, criteria.countries);
     if (matched) matchedCount++;
     breakdown.country = matched;
   }
@@ -625,6 +639,15 @@ function sortEntries(entries, mode) {
       return a.i - b.i;
     })
     .map((x) => x.e);
+}
+
+// レコメンド結果の並べ替え（3ツール共通）。価格順でも「条件に全部合う」商品を先に、
+// 「一部だけ合う」商品をその後ろに並べる。全件を並べ替えてから、画面側が先頭から表示する
+// （以前は一致度順の先頭20件だけを価格順に並べ替えていたため、本当の最安・最高値が出なかった。2026-11修正）。
+function orderHits(hits, mode) {
+  if (mode !== 'priceAsc' && mode !== 'priceDesc') return hits.slice();
+  const isFull = (e) => !(e.totalCriteria > 0) || e.score === 1;
+  return sortEntries(hits.filter(isFull), mode).concat(sortEntries(hits.filter((e) => !isFull(e)), mode));
 }
 
 
@@ -1252,6 +1275,10 @@ function parsePriceInput(id) {
 function currentCriteria() {
   const freeTextTags = resolvePairingText(document.getElementById('pairingFreeText').value);
   const pairingTags = Array.from(new Set([...getCheckedValues('pairing'), ...freeTextTags]));
+  // 自由入力が辞書に当たらないときは条件に数えず、その旨を入力欄の下に出す
+  // （以前は「条件あり」と数えていたため、無関係な全商品が結果に出ていた。2026-11修正）
+  const pairingText = document.getElementById('pairingFreeText').value.trim();
+  document.getElementById('pairingFreeTextNote').classList.toggle('hidden', !pairingText || freeTextTags.length > 0);
   return {
     freeText: document.getElementById('recommendFreeText').value.trim(),
     priceBandIds: priceLabelsToBandIds(getCheckedValues('price')),
@@ -1267,14 +1294,12 @@ function currentCriteria() {
     body: getCheckedValues('body'),
     tasteTags: getCheckedValues('tasteTag'),
     pairingTags,
-    // 料理の自由入力が辞書に当たらなかったときも「条件あり」と数えるため
-    pairingFreeText: document.getElementById('pairingFreeText').value.trim(),
   };
 }
 
 // ワインの scoring.js には hasAnyCriteria がないので、画面側で判定する
 function hasAnyCriteria(c) {
-  return !!(c.freeText || c.pairingFreeText || c.priceBandIds.length || c.priceMin !== null || c.priceMax !== null
+  return !!(c.freeText || c.priceBandIds.length || c.priceMin !== null || c.priceMax !== null
     || c.colors.length || c.sparklingOnly || c.veganOnly || c.countries.length || c.regions.length
     || c.varieties.length || c.sweetness.length || c.body.length || c.tasteTags.length || c.pairingTags.length);
 }
@@ -1390,7 +1415,12 @@ function renderResultCard(entry) {
 
 let lastResults = { has: false, withCriteria: false, fullCount: 0, shown: 0 };
 
-function runSearch() {
+// 一度に出す件数。条件や並び順を変えたら最初の件数に戻す（keepLimit は「もっと見る」のときだけ true）
+const RESULTS_PAGE = 20;
+let resultsLimit = RESULTS_PAGE;
+
+function runSearch(keepLimit) {
+  if (keepLimit !== true) resultsLimit = RESULTS_PAGE;
   const criteria = currentCriteria();
   const resultsEl = document.getElementById('results');
   const bar = document.getElementById('resultsBar');
@@ -1406,23 +1436,33 @@ function runSearch() {
   // 条件が1つも合わない商品（一致度0%）は出さない。フリーワードだけのときは全件が「一致」
   const hits = withCriteria ? all.filter((e) => e.score > 0) : all;
   const fullCount = withCriteria ? hits.filter((e) => e.score === 1).length : hits.length;
-  const top = sortEntries(hits.slice(0, 20), document.getElementById('resultsSort').value);
-  lastResults = { has: true, withCriteria, fullCount, shown: top.length };
+  // 全件を並べ替えてから先頭 resultsLimit 件を出す（続きは「もっと見る」）
+  const ordered = orderHits(hits, document.getElementById('resultsSort').value);
+  const top = ordered.slice(0, resultsLimit);
+  const rest = ordered.length - top.length;
+  const partialCount = hits.length - fullCount;
+  lastResults = { has: true, withCriteria, fullCount, shown: hits.length };
 
-  let countHtml;
-  if (withCriteria) {
-    countHtml = `▼ 条件に全部合う ${fullCount}件`
-      + (top.length > fullCount ? `<small>一部だけ合うものを含め、一致度の高い${top.length}件を表示</small>` : '');
-  } else {
-    countHtml = `▼ ${hits.length}件` + (hits.length > top.length ? `<small>上位${top.length}件を表示</small>` : '');
-  }
+  const notes = [];
+  if (withCriteria && partialCount > 0) notes.push(`ほかに一部だけ合うもの ${partialCount}件`);
+  if (rest > 0) notes.push(`${top.length}件まで表示中（続きは下の「もっと見る」）`);
+  const countHtml = (withCriteria ? `▼ 条件に全部合う ${fullCount}件` : `▼ ${hits.length}件`)
+    + (notes.length ? `<small>${notes.join('／')}</small>` : '');
   document.getElementById('resultsCount').innerHTML = countHtml;
   bar.classList.remove('hidden');
   resultsEl.innerHTML = top.length > 0
     ? top.map(renderResultCard).join('')
+      + (rest > 0 ? `<button type="button" id="resultsMoreButton" class="secondary" style="width:100%;">もっと見る（残り${rest}件）</button>` : '')
     : '<p class="muted">条件に合う商品が見つかりませんでした。条件を減らしてお試しください。</p>';
   updateDock();
 }
+
+// 「もっと見る」：今の条件・並び順のまま、表示を20件ずつ増やす
+document.getElementById('results').addEventListener('click', (e) => {
+  if (!e.target.closest('#resultsMoreButton')) return;
+  resultsLimit += RESULTS_PAGE;
+  runSearch(true);
+});
 
 // 結果が画面に見えていない間だけ、下に「結果を見る」ボタンを出す
 let resultsVisible = false;
@@ -1667,21 +1707,32 @@ document.getElementById('admReactivateButton').addEventListener('click', async (
   if (success) showAdminMsg('取扱を再開しました', true);
 });
 
+// 確認欄に名前を出した商品だけを削除する（確認欄を出した後にプルダウンを変えても、別の商品は消えない）
+let pendingDeleteCode = null;
+
+document.getElementById('admDeleteTarget').addEventListener('change', () => {
+  pendingDeleteCode = null;
+  document.getElementById('admDeleteConfirm').classList.add('hidden');
+});
+
 document.getElementById('admDeleteButton').addEventListener('click', () => {
   const code = document.getElementById('admDeleteTarget').value;
   if (!code) { showAdminMsg('対象商品を選択してください', false); return; }
+  pendingDeleteCode = code;
   const product = ADMIN_DISCONTINUED.find((p) => p.code === code);
   document.getElementById('admDeleteConfirmName').textContent = product ? product.name : code;
   document.getElementById('admDeleteConfirm').classList.remove('hidden');
 });
 
 document.getElementById('admDeleteCancelButton').addEventListener('click', () => {
+  pendingDeleteCode = null;
   document.getElementById('admDeleteConfirm').classList.add('hidden');
 });
 
 document.getElementById('admDeleteConfirmButton').addEventListener('click', async () => {
-  const code = document.getElementById('admDeleteTarget').value;
-  if (!code) { showAdminMsg('対象商品を選択してください', false); return; }
+  const code = pendingDeleteCode;
+  if (!code) return;
+  pendingDeleteCode = null;
   document.getElementById('admDeleteConfirm').classList.add('hidden');
   const success = await callAppsScript({ action: 'delete', code });
   if (success) showAdminMsg('完全に削除しました', true);
