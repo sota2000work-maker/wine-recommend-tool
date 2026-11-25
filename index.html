@@ -594,11 +594,40 @@ function scoreProduct(product, criteria) {
   return { score, matchedCount, totalCriteria, breakdown };
 }
 
-// 商品名・国・地方・品種を対象にした部分一致検索（一覧タブ・レコメンドタブ共通）
+// 検索用の表記ゆれ吸収（入力側・商品側の両方に同じ変換をかけてから比べる）。
+// 2026-11追加：「キャンティ」で検索すると「キアンティ」表記の商品が出ず、売場に2種あるのに1件しか出なかったため。
+// ワインのカタカナ表記は輸入元ごとに揺れる（ヴォ/ボ、チア/チャ、メルロ/メルロー等）ので、まとめてそろえる。
+// 揺れの組を増やすときは SEARCH_VARIANTS に [揺れ側, そろえる側] で足す（ヴ→バ行・長音などを処理した後の形で書く）。
+const SEARCH_VARIANTS = [
+  ['キア', 'キャ'],         // キアンティ → キャンティ
+  ['チア', 'チャ'],         // モンテプルチアーノ → モンテプルチャーノ
+  ['ニヨン', 'ニョン'],     // ソーヴィニヨン → ソーヴィニョン
+  ['ニオン', 'ニョン'],     // ソービニオン → ソーヴィニョン
+  ['ノワ', 'ノア'],         // ピノ・ノワール → ピノ・ノアール
+  ['イヤ', 'イア'],         // ナイヤガラ → ナイアガラ
+  ['カルム', 'カルメ'],     // カルムネール → カルメネール
+];
+
+function normalizeSearchText(str) {
+  let s = String(str).normalize('NFKC').toLowerCase();
+  // ひらがな → カタカナ
+  s = s.replace(/[ぁ-ゖ]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 0x60));
+  // ヴ → バ行
+  s = s.replace(/ヴァ/g, 'バ').replace(/ヴィ/g, 'ビ').replace(/ヴェ/g, 'ベ').replace(/ヴォ/g, 'ボ')
+    .replace(/ヴュ/g, 'ビュ').replace(/ヴ/g, 'ブ');
+  // 長音・中黒・小さいッ・空白・記号を取り除く（メルロ/メルロー、クラッシコ/クラシコ、ピノ・ノワール/ピノノワール）
+  s = s.replace(/[ー\-－‐・･=＝\sッ]/g, '');
+  for (const [from, to] of SEARCH_VARIANTS) s = s.split(from).join(to);
+  return s;
+}
+
+// 商品名・国・地方・品種を対象にした部分一致検索（一覧タブ・レコメンドタブ共通）。表記ゆれは normalizeSearchText で吸収する
 function matchesFreeText(product, text) {
   if (!text) return true;
+  const q = normalizeSearchText(text);
+  if (!q) return true;
   return [product.name, product.country, product.region, ...(product.varieties || [])]
-    .filter(Boolean).some((v) => v.includes(text));
+    .filter(Boolean).some((v) => normalizeSearchText(v).includes(q));
 }
 
 // スプレッドシート由来の真偽値は true（チェックボックス）でも "TRUE"（文字列）でも来うるのでそろえる
