@@ -594,32 +594,52 @@ function scoreProduct(product, criteria) {
   return { score, matchedCount, totalCriteria, breakdown };
 }
 
-// 検索用の表記ゆれ吸収（入力側・商品側の両方に同じ変換をかけてから比べる）。
-// 2026-11追加：「キャンティ」で検索すると「キアンティ」表記の商品が出ず、売場に2種あるのに1件しか出なかったため。
-// ワインのカタカナ表記は輸入元ごとに揺れる（ヴォ/ボ、チア/チャ、メルロ/メルロー等）ので、まとめてそろえる。
-// 揺れの組を増やすときは SEARCH_VARIANTS に [揺れ側, そろえる側] で足す（ヴ→バ行・長音などを処理した後の形で書く）。
+// 検索の表記ゆれの組（ワイン用）。[揺れ側, そろえる側] をふつうの書き方で足せばよい（共通の変換は自動でかかる）。
+// ワインのカタカナ表記は輸入元ごとに揺れる。2026-11：「キャンティ」で「キアンティ」表記の商品が出なかったのがきっかけ。
 const SEARCH_VARIANTS = [
   ['キア', 'キャ'],         // キアンティ → キャンティ
   ['チア', 'チャ'],         // モンテプルチアーノ → モンテプルチャーノ
-  ['ニヨン', 'ニョン'],     // ソーヴィニヨン → ソーヴィニョン
-  ['ニオン', 'ニョン'],     // ソービニオン → ソーヴィニョン
-  ['ノワ', 'ノア'],         // ピノ・ノワール → ピノ・ノアール
+  // ソーヴィニヨン系は「ニヨン」にそろえる（「ニョン」にそろえると「ヴィーニョ（ヴェルデ）」でソーヴィニヨンが全部出てしまうため）
+  ['ニョン', 'ニヨン'],     // ソーヴィニョン → ソーヴィニヨン
+  ['ニオン', 'ニヨン'],     // ソービニオン → ソーヴィニヨン
+  // 「ノアール」だけでそろえると「ゴヴェルノ・アッルーゾ」の「ノ・アッ」まで当たるので、ピノ付きに限る
+  ['ピノ・ノアール', 'ピノ・ノワール'],
   ['イヤ', 'イア'],         // ナイヤガラ → ナイアガラ
   ['カルム', 'カルメ'],     // カルムネール → カルメネール
 ];
 
+// ---------- 4ツール共通：検索の表記ゆれ吸収（ワイン・ウイスキー・焼酎・日本酒で同じ。違うのは上の SEARCH_VARIANTS だけ） ----------
+// 入力側・商品側の両方に同じ変換をかけてから部分一致で比べる。商品データそのものは書き換えない（2026-11追加）。
+// 共通でそろえるもの：全角/半角・大文字/小文字、ひらがな/カタカナ、旧字体（齋→斎、龍→竜、廣→広、濱→浜 など）、
+// ヴ/バ行（ヴォ→ボ）、長音「ー」・中黒「・」・小さい「ッ」・空白・かっこ・「〜」（メルロ/メルロー、クラッシコ/クラシコ）、°/度。
+// このブロックを直すときは4ツールの scoring.js を同時に直すこと。
+const SEARCH_CHAR_MAP = {
+  齋: '斎', 彌: '弥', 龍: '竜', 澤: '沢', 櫻: '桜', 寶: '宝', 傳: '伝', 眞: '真', 國: '国', 藏: '蔵',
+  萬: '万', 壽: '寿', 醉: '酔', 黑: '黒', 嶋: '島', 嶌: '島', 濱: '浜', 邊: '辺', 邉: '辺', 髙: '高',
+  﨑: '崎', 德: '徳', 廣: '広', 當: '当', 榮: '栄', 惠: '恵', 釀: '醸', 壺: '壷', ヰ: 'イ', ヱ: 'エ', '°': '度',
+};
+const SEARCH_CHAR_RE = new RegExp('[' + Object.keys(SEARCH_CHAR_MAP).join('') + ']', 'g');
+
+function baseNormalizeSearchText(str) {
+  return String(str).normalize('NFKC').toLowerCase()
+    .replace(/[ぁ-ゖ]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 0x60)) // ひらがな → カタカナ
+    .replace(SEARCH_CHAR_RE, (c) => SEARCH_CHAR_MAP[c])
+    .replace(/ヴァ/g, 'バ').replace(/ヴィ/g, 'ビ').replace(/ヴェ/g, 'ベ').replace(/ヴォ/g, 'ボ')
+    .replace(/ヴュ/g, 'ビュ').replace(/ヴ/g, 'ブ')
+    .replace(/[ー\-‐―−・･=\s~〜ッ「」『』()【】"']/g, '');
+}
+
+// SEARCH_VARIANTS はふつうの書き方で書いてあるので、共通の変換をかけた形にしてから使う
+const SEARCH_VARIANT_PAIRS = SEARCH_VARIANTS
+  .map(([from, to]) => [baseNormalizeSearchText(from), baseNormalizeSearchText(to)])
+  .filter(([from, to]) => from && from !== to);
+
 function normalizeSearchText(str) {
-  let s = String(str).normalize('NFKC').toLowerCase();
-  // ひらがな → カタカナ
-  s = s.replace(/[ぁ-ゖ]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 0x60));
-  // ヴ → バ行
-  s = s.replace(/ヴァ/g, 'バ').replace(/ヴィ/g, 'ビ').replace(/ヴェ/g, 'ベ').replace(/ヴォ/g, 'ボ')
-    .replace(/ヴュ/g, 'ビュ').replace(/ヴ/g, 'ブ');
-  // 長音・中黒・小さいッ・空白・記号を取り除く（メルロ/メルロー、クラッシコ/クラシコ、ピノ・ノワール/ピノノワール）
-  s = s.replace(/[ー\-－‐・･=＝\sッ]/g, '');
-  for (const [from, to] of SEARCH_VARIANTS) s = s.split(from).join(to);
+  let s = baseNormalizeSearchText(str);
+  for (const [from, to] of SEARCH_VARIANT_PAIRS) s = s.split(from).join(to);
   return s;
 }
+// ---------- 4ツール共通ここまで ----------
 
 // 商品名・国・地方・品種を対象にした部分一致検索（一覧タブ・レコメンドタブ共通）。表記ゆれは normalizeSearchText で吸収する
 function matchesFreeText(product, text) {
