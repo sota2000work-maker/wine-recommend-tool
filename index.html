@@ -93,6 +93,7 @@
   .caution { color: #8a3b1c; font-size: 12px; background: #fbeee5; padding: 6px 8px; border-radius: 6px; margin-top: 6px; }
   .tag.glossary { border-color: var(--gold); cursor: pointer; }
   .tag.vegan { background: #e6f2e1; border-color: #9cc48a; color: #2f5a1f; font-weight: 600; }
+  .tag.organic { background: #f3efdc; border-color: #c9b66b; color: #5a4a12; font-weight: 600; }
   .muted { color: var(--ink-soft); font-size: 13px; }
   .syncBar { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--ink-soft); margin-bottom: 6px; }
   #regionField { display: none; }
@@ -262,6 +263,7 @@
       <div id="colorFields"></div>
       <label style="display:block;margin-top:8px;"><input type="checkbox" id="sparklingOnly">スパークリングのみ表示</label>
       <label style="display:block;margin-top:4px;"><input type="checkbox" id="veganOnly">ヴィーガン認証のみ表示</label>
+      <label style="display:block;margin-top:4px;"><input type="checkbox" id="organicOnly">オーガニック認証のみ表示</label>
     </fieldset>
 
     <fieldset>
@@ -348,6 +350,8 @@
       <label><input type="checkbox" id="admSparkling">スパークリング</label>
       <label><input type="checkbox" id="admVegan">ヴィーガン認証（第三者機関の認証マークあり。稲葉ナチュラルだけのものは対象外）</label>
       <label>ヴィーガン認証の根拠（認証にチェックしたときは必須）<input type="text" id="admVeganSource" placeholder="例：裏ラベルにEVE VEGANマーク"></label>
+      <label><input type="checkbox" id="admOrganic">オーガニック認証（公的な有機認証マーク、有機認証機関名、Demeter・Biodyvin のいずれかあり。切り替え中・サステナブル・言葉だけのものは対象外）</label>
+      <label>オーガニック認証の根拠（認証にチェックしたときは必須）<input type="text" id="admOrganicSource" placeholder="例：裏ラベルにEUの有機マーク"></label>
       <label>国<input type="text" id="admCountry" placeholder="例：フランス"></label>
       <label>地方（任意）<input type="text" id="admRegion"></label>
       <label>品種（カンマ区切り・任意）<input type="text" id="admVarieties"></label>
@@ -657,9 +661,11 @@ function isTrue(v) {
 
 // 「〜のみ」のチェックは点数ではなく絞り込み。該当しない商品は結果に出さない（2026-11 変更。
 // 以前の「スパークリングのみ表示」は加点方式で、スパークリング以外も下位に出ていた）
+// オーガニック認証のみ（2026-11-27 追加）も同じく絞り込み
 function passesFilters(product, criteria) {
   if (criteria.sparklingOnly && !isTrue(product.sparkling)) return false;
   if (criteria.veganOnly && !isTrue(product.vegan)) return false;
+  if (criteria.organicOnly && !isTrue(product.organic)) return false;
   return true;
 }
 
@@ -1290,6 +1296,10 @@ function veganTagHtml(p) {
   return isTrue(p.vegan) ? '<span class="tag vegan">ヴィーガン認証</span>' : '';
 }
 
+function organicTagHtml(p) {
+  return isTrue(p.organic) ? '<span class="tag organic">オーガニック認証</span>' : '';
+}
+
 function buildReasonText(product, matchedPairingTags) {
   if (!matchedPairingTags || matchedPairingTags.length === 0) return '';
   const reasons = matchedPairingTags
@@ -1336,6 +1346,7 @@ function currentCriteria() {
     colors: getCheckedValues('color'),
     sparklingOnly: document.getElementById('sparklingOnly').checked,
     veganOnly: document.getElementById('veganOnly').checked,
+    organicOnly: document.getElementById('organicOnly').checked,
     countries: getCheckedValues('country'),
     regions: getCheckedValues('region'),
     varieties: getCheckedValues('variety'),
@@ -1349,7 +1360,7 @@ function currentCriteria() {
 // ワインの scoring.js には hasAnyCriteria がないので、画面側で判定する
 function hasAnyCriteria(c) {
   return !!(c.freeText || c.priceBandIds.length || c.priceMin !== null || c.priceMax !== null
-    || c.colors.length || c.sparklingOnly || c.veganOnly || c.countries.length || c.regions.length
+    || c.colors.length || c.sparklingOnly || c.veganOnly || c.organicOnly || c.countries.length || c.regions.length
     || c.varieties.length || c.sweetness.length || c.body.length || c.tasteTags.length || c.pairingTags.length);
 }
 
@@ -1390,6 +1401,7 @@ function cardTagsHtml(p) {
   const tag = (t, cls) => `<span class="tag${cls ? ' ' + cls : ''}">${escapeHtml(t)}</span>`;
   return tasteScaleHtml(p, false)
     + veganTagHtml(p)
+    + organicTagHtml(p)
     + (p.tasteTags || []).map((t) => glossaryTagHtml(t)).join('')
     + (p.pairingTags || []).map((t) => tag(t, 'sv')).join('');
 }
@@ -1610,6 +1622,7 @@ function openDetail(code) {
     <div class="muted">${escapeHtml(p.producer) || ''}</div>
     ${metaLineHtml(p)}
     ${isTrue(p.vegan) ? `<div>${veganTagHtml(p)}<span class="muted">根拠: ${escapeHtml(p.veganSource) || '未記入'}</span></div>` : ''}
+    ${isTrue(p.organic) ? `<div>${organicTagHtml(p)}<span class="muted">根拠: ${escapeHtml(p.organicSource) || '未記入'}</span></div>` : ''}
     <div>${(p.varieties || []).map((v) => `<span class="tag">${escapeHtml(v)}</span>`).join('')}</div>
     ${tasteScaleHtml(p, true)}
     <div>${(p.tasteTags || []).map((t) => glossaryTagHtml(t)).join('')}</div>
@@ -1734,6 +1747,9 @@ document.getElementById('admAddButton').addEventListener('click', async () => {
   const vegan = document.getElementById('admVegan').checked;
   const veganSource = document.getElementById('admVeganSource').value.trim() || null;
   if (vegan && !veganSource) { showAdminMsg('ヴィーガン認証の根拠を入力してください', false); return; }
+  const organic = document.getElementById('admOrganic').checked;
+  const organicSource = document.getElementById('admOrganicSource').value.trim() || null;
+  if (organic && !organicSource) { showAdminMsg('オーガニック認証の根拠を入力してください', false); return; }
   const product = {
     code: 'W-' + Date.now(),
     name,
@@ -1744,6 +1760,8 @@ document.getElementById('admAddButton').addEventListener('click', async () => {
     sparkling: document.getElementById('admSparkling').checked,
     vegan,
     veganSource: vegan ? veganSource : null,
+    organic,
+    organicSource: organic ? organicSource : null,
     country: document.getElementById('admCountry').value.trim() || null,
     region: document.getElementById('admRegion').value.trim() || null,
     varieties: splitCsv(document.getElementById('admVarieties').value),
@@ -1976,7 +1994,7 @@ const LEARN_SECTIONS = [
       },
       {
         term: 'オーガニック（有機）ワイン',
-        body: '化学合成の農薬や肥料を使わずに育てたぶどうで造ったワイン。国ごとに細かな違いはあるが、どの国も「法律で決まった基準に沿って、第三者の機関が畑や醸造所を検査する」点は同じ。ラベルの有機認証マークが目印。主なマークは、EUの有機マーク（緑の葉の形）、フランスのAB、ドイツのBio-Siegel（六角形）、アメリカのUSDA Organic、日本の有機JASなど。CCOF、Ecocertなどの認証機関の名前が書かれていることもある。EUの有機ワインはぶどうだけでなく醸造の決まりもあり、酸化防止剤の量は通常のワインより少なく抑えられている（使用自体は認められている）。「有機へ切り替え中」（en conversion、In Umstellung など）の表示は、まだ認証が下りていない段階。',
+        body: '化学合成の農薬や肥料を使わずに育てたぶどうで造ったワイン。国ごとに細かな違いはあるが、どの国も「法律で決まった基準に沿って、第三者の機関が畑や醸造所を検査する」点は同じ。ラベルの有機認証マークが目印。主なマークは、EUの有機マーク（緑の葉の形）、フランスのAB、ドイツのBio-Siegel（六角形）、アメリカのUSDA Organic、日本の有機JASなど。CCOF、Ecocertなどの認証機関の名前が書かれていることもある。EUの有機ワインはぶどうだけでなく醸造の決まりもあり、酸化防止剤の量は通常のワインより少なく抑えられている（使用自体は認められている）。「有機へ切り替え中」（en conversion、In Umstellung など）の表示は、まだ認証が下りていない段階。このツールの「オーガニック認証のみ表示」は、上の有機認証マーク・認証機関の名前・ビオディナミ認証（Demeter、Biodyvin）のどれかがあるものだけ（ぶどうだけ有機認証も含む）。',
         talk: 'こちらは国の基準で検査を受けた、認証付きのオーガニックワインです。',
       },
       {
