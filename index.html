@@ -109,6 +109,7 @@
   .msg.err { background: #fdecea; color: #611a15; }
   #authGate { position: fixed; inset: 0; background: linear-gradient(180deg, var(--wine-dark), var(--wine)); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 24px; }
   #authGate.hidden { display: none; }
+  html.has-saved-login #authGate { display: none; }
   .authBox { max-width: 360px; width: 100%; background: var(--paper); border-radius: 16px; padding: 24px 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.25); }
   .authBox h2 { font-size: 19px; margin: 0 0 4px; color: var(--wine-dark); text-align: center; }
   .authBox .muted { text-align: center; margin-bottom: 14px; }
@@ -206,6 +207,14 @@
     label { display: block; }
   }
 </style>
+<script>
+// 認証済みの端末（パスコードとデータが保存済み）では、パスコード画面を最初から隠してちらつきを防ぐ（2026-11-28）
+try {
+  if (localStorage.getItem('wineToolStaffPasscode_v1') && localStorage.getItem('wineToolCache_v1')) {
+    document.documentElement.classList.add('has-saved-login');
+  }
+} catch (e) {}
+</script>
 </head>
 <body>
 
@@ -1142,12 +1151,33 @@ document.getElementById('authButton').addEventListener('click', async () => {
   if (ok) enterApp();
 });
 
+// パスコード画面を出す（保存済み端末では <head> の先読みで隠しているので、その印を外す）
+function showAuthGate() {
+  document.documentElement.classList.remove('has-saved-login');
+}
+
 async function initAuth() {
   const storedPasscode = localStorage.getItem(STAFF_PASSCODE_KEY);
-  if (storedPasscode) {
-    const ok = await tryStaffLogin(storedPasscode, true);
-    if (ok) { enterApp(); return; }
+  if (!storedPasscode) { showAuthGate(); return; }
+  const cached = APPS_SCRIPT_URL ? loadCache() : null;
+  if (cached) {
+    // 認証済みの端末は、サーバー（Apps Script）の返事を待たずに前回のデータで即表示し、
+    // 最新化とパスコードの確認は裏で行う（2026-11-28。以前は返事が来るまで数秒パスコード画面で待っていた）
+    PRODUCTS = cached;
+    enterApp();
+    const result = await syncFromServer(storedPasscode, true);
+    if (!result.ok && result.reason === 'invalid') {
+      // パスコードが変更された端末は、保存内容を消して入力画面へ戻す
+      localStorage.removeItem(STAFF_PASSCODE_KEY);
+      localStorage.removeItem(STORAGE_KEY);
+      alert('パスコードが変更されました。新しいパスコードを入力してください。');
+      location.reload();
+    }
+    return;
   }
+  const ok = await tryStaffLogin(storedPasscode, true);
+  if (ok) { enterApp(); return; }
+  showAuthGate();
   // ゲート画面のまま入力待ち
 }
 
